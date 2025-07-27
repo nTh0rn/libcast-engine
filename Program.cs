@@ -1,25 +1,22 @@
 ﻿using Raylib_cs;
+using System.Numerics;
 
-namespace HelloWorld;
+namespace LibCast {
+    class Program {
+        [STAThread]
+        public static void Main() {
+            Screen.Init();
 
-class Program
-{
-    // STAThread is required if you deploy using NativeAOT on Windows - See https://github.com/raylib-cs/raylib-cs/issues/301
-    [STAThread]
-    public static void Main()
-    {
-        Raylib.InitWindow(800, 480, "Hello World");
+            while (!Raylib.WindowShouldClose()) {
+                Screen.LoopInit();
 
-        while (!Raylib.WindowShouldClose())
-        {
-            Raylib.BeginDrawing();
-            Raylib.ClearBackground(Color.White);
+                Raylib.ClearBackground(Color.White);
+                Raylib.DrawTextEx(Screen.terminalFont, "Hello, world!", new Vector2(12, 12), 32, 0, Color.Black);
 
-            Raylib.DrawText("Hello, world!", 12, 12, 20, Color.Black);
+                Screen.LoopClose();
+            }
 
-            Raylib.EndDrawing();
+            Screen.Close();
         }
-
-        Raylib.CloseWindow();
     }
 }
