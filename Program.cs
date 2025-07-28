@@ -6,13 +6,21 @@ namespace LibCast {
         [STAThread]
         public static void Main() {
             Screen.Init();
+            Screen.Resize();
+            Terminal.Resize();
 
             while (!Raylib.WindowShouldClose()) {
                 Screen.LoopInit();
 
-                Raylib.ClearBackground(Color.White);
-                Raylib.DrawTextEx(Screen.terminalFont, "Hello, world!", new Vector2(12, 12), 32, 0, Color.Black);
+                // Raylib.ClearBackground(Color.White);
+                
+                
+                //Console.WriteLine("Yuppers" + Screen.deltaTime);
+                //Screen.DrawRect(2, 2, 10, 10, Color.Green);
 
+                Screen.Draw();
+                Terminal.Draw();
+                Raylib.DrawTextEx(Screen.terminalFont, "Hello, world!", new Vector2(2, 2), 20, 0, Color.Black);
                 Screen.LoopClose();
             }
 
