@@ -1,27 +1,27 @@
 
 namespace LibCast {
     public class Timer {
-        private float counter = 0f;
-        private readonly float interval;
+        private double counter = 0;
+        private readonly double interval;
 
-        public Timer(float interval) {
+        public Timer(double interval) {
             this.interval = interval;
         }
 
-        public bool Tick(float deltaTime) {
+        public bool Tick(double deltaTime) {
             counter += deltaTime;
             if (counter >= interval) {
-                counter -= interval; // subtract instead of reset to reduce drift
+                counter -= interval;
                 return true;
             }
             return false;
         }
 
         public void Reset() {
-            counter = 0f;
+            counter = 0;
         }
 
-        public float GetRemainingTime() {
+        public double GetRemainingTime() {
             return interval - counter;
         }
     }
