@@ -19,8 +19,9 @@ namespace LibCast {
     }
 
     public class WallCell : RoomCell {
-    public Raylib_cs.Color color;
-    public string texture = "assets/textures/wall.png";
+        public Raylib_cs.Color color;
+        public bool isTextured = false;
+        public string? texture { get; set; }
         public WallCell(double x, double y, char character, Raylib_cs.Color color) : base(x, y, character) {
             this.color = color;
         }
@@ -70,7 +71,7 @@ namespace LibCast {
         public RoomCell ParseRoomChar(char character, int x, int y) {
             switch (character) {
                 case '#':
-                    return new WallCell(x, y, character, Raylib_cs.Color.Black);
+                    return new BrickCell(x, y, character, Raylib_cs.Color.Black);
                 case ' ':
                     return new EmptyCell(x, y, character);
                 case '@':
@@ -94,8 +95,8 @@ namespace LibCast {
             textures = new Dictionary<WallCell, Raylib_cs.Color[,]>();
             foreach (List<RoomCell> row in room) {
                 foreach (RoomCell cell in row) {
-                    if (cell is WallCell wallCell) {
-                        string texturePath = wallCell.texture;
+                    if (cell.isTextured) {
+                        string texturePath = ((WallCell)cell).texture;
                         if (!File.Exists(texturePath)) {
                             throw new FileNotFoundException($"Texture file not found: {texturePath}. Current directory: {Directory.GetCurrentDirectory()}");
                         }
@@ -109,7 +110,7 @@ namespace LibCast {
                                     pixels[y, x] = new Raylib_cs.Color(c.R, c.G, c.B, c.A);
                                 }
                             }
-                            textures.Add(wallCell, pixels);
+                            textures.Add((WallCell)cell, pixels);
                         }
                     }
                 }

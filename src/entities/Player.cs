@@ -4,7 +4,7 @@ namespace LibCast {
     public class Player : Entity {
         public override bool running { get; set; } = true;
         public override double direction { get; set; } = 0;
-        public override double radius { get; set; } = 0.25;
+        public override double radius { get; set; } = 0.10;
 
         private double traversalScale = 10;
 
@@ -41,10 +41,10 @@ namespace LibCast {
         private void moveDirection(double dir) {
             double dx = Math.Cos((dir) * (Math.PI / 180.0)) / traversalScale;
             double dy = -Math.Sin((dir) * (Math.PI / 180.0)) / traversalScale;
-            if (Game.room.room[(int)(y)][(int)(x + dx)] is EmptyCell) {
+            if (Game.room.room[(int)(y)][(int)(x + dx + (dx > 0 ? radius : -radius))] is EmptyCell) {
                 x += dx;
             }
-            if(Game.room.room[(int)(y+dy)][(int)(x)] is EmptyCell) {
+            if(Game.room.room[(int)(y + dy + (dy > 0 ? radius : -radius))][(int)(x)] is EmptyCell) {
                 y += dy;
             }
         }

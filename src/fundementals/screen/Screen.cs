@@ -44,9 +44,9 @@ namespace LibCast {
         public static int windowHeight = 1080;
         public static int bufferWidth = 1920;
         public static int bufferHeight = 1080;
-        public static int gameWidth = 128;
-        public static int gameHeight = 72;
-        public static int pixelScale = 15;
+        public static int gameWidth = 192;
+        public static int gameHeight = 108;
+        public static int pixelScale = 10;
         public static RenderTexture2D target;
         public static double scale;
         public static Vector2 mouse;
