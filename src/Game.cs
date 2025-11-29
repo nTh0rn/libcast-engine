@@ -1,5 +1,3 @@
-using Raylib_cs;
-
 namespace LibCast {
     public class Game {
         public static Room room = new RoomDefault(); // Current room

@@ -25,7 +25,7 @@ namespace LibCast {
             for (int i = 0; i < height; i++) {
                 cells.Add(new List<RoomCell>());
                 for (int j = 0; j < width; j++) {
-                    cells[i].Add(new RoomCell(j, i, '#'));
+                    cells[i].Add(new WallCell(j, i, '#', Raylib_cs.Color.Gray));
                 }
             }
             MazeCell firstCell = new MazeCell(1, 1);
@@ -54,6 +54,8 @@ namespace LibCast {
         private static MazeCell InitMazeCell(MazeCell cell) {
             cell.dirs = new List<int>{};
             int i = 1;
+
+            //all shall debug me and dispair
             foreach (int direction in new int[] { 0, 2, 3, 1 }) {
                 try {
                     string t = "";

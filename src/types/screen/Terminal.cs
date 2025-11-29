@@ -1,9 +1,4 @@
 
-using System.Reflection.PortableExecutable;
-using Raylib_cs;
-using System.Numerics;
-using System.Runtime.InteropServices;
-using System.Data;
 
 namespace LibCast {
     public class Char {
@@ -125,7 +120,7 @@ namespace LibCast {
         }
 
         public static void DrawCursor() {
-            if (cursorFlashTimer.Tick(Screen.deltaTime)) {
+            if (cursorFlashTimer.Tick()) {
                 cursorChar.InvertColors();
                 cursorFlashToggle++;
                 Console.WriteLine("Inverted: " + cursorFlashToggle);

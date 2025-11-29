@@ -1,4 +1,3 @@
-using Raylib_cs;
 
 namespace LibCast {
     public class Player : Entity {
@@ -16,10 +15,10 @@ namespace LibCast {
 
         public override bool Loop() {
             if (KeyDown(KeyboardKey.Comma)) {
-                direction += KeyDown(KeyboardKey.LeftShift) ? 5 : 3;
+                direction += (KeyDown(KeyboardKey.LeftShift) ? 6 : 3)*Screen.deltaTime;
             }
             if (KeyDown(KeyboardKey.Period)) {
-                direction -= KeyDown(KeyboardKey.LeftShift) ? 5 : 3;
+                direction -= (KeyDown(KeyboardKey.LeftShift) ? 6 : 3)*Screen.deltaTime;
             }
             if (KeyDown(KeyboardKey.A)) {
                 moveDirection(direction + 90);
@@ -42,10 +41,10 @@ namespace LibCast {
             double dx = Math.Cos((dir) * (Math.PI / 180.0)) / traversalScale;
             double dy = -Math.Sin((dir) * (Math.PI / 180.0)) / traversalScale;
             if (Game.room.room[(int)(y)][(int)(x + dx + (dx > 0 ? radius : -radius))] is EmptyCell) {
-                x += dx;
+                x += dx * Screen.deltaTime;
             }
             if(Game.room.room[(int)(y + dy + (dy > 0 ? radius : -radius))][(int)(x)] is EmptyCell) {
-                y += dy;
+                y += dy * Screen.deltaTime;
             }
         }
 
