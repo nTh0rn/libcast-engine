@@ -1,5 +1,3 @@
-using Raylib_cs;
-
 namespace LibCast {
     public class Game {
         public static Room room = new RoomDefault(); // Current room
@@ -23,6 +21,7 @@ namespace LibCast {
 
         public static void Loop() {
             Random rng = new Random();
+            
             Screen.DrawBackground(0);
             room.Loop();
             Screen.DrawFPS();
