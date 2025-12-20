@@ -1,21 +1,21 @@
 namespace LibCast {
     public class RoomDefault : Room {
         public override string name => "rmDefault";
-        public override List<List<char>> roomRaw => MazeGeneration.GenerateMaze(30, 30);
-        //  public override List<List<char>> roomRaw => new List<List<char>>(){
-        //     new List<char>{'#','#','#','#','#','#','#'},
-        //     new List<char>{'#',' ',' ',' ',' ',' ','#'},
-        //     new List<char>{'#',' ','*','*',' ','#','#'},
-        //     new List<char>{'#',' ','*',' ','#'},
-        //     new List<char>{' ',' ','*',' ',' ','#','#','#','#','#'},
-        //     new List<char>{'#',' ',' ',' ',' ',' ',' ',' ',' ','#'},
-        //     new List<char>{'#',' ','!','#',' ',' ','#','#','#','#'},
-        //     new List<char>{'#',' ','#','#',' ',' ','#'},
-        //     new List<char>{'#',' ',' ',' ',' ',' ','#'},
-        //     new List<char>{'#',' ',' ',' ',' ',' ','#'},
-        //     new List<char>{'#',' ',' ',' ',' ',' ','#'},
-        //     new List<char>{'#',' ',' ',' ',' ',' ','#'},
-        //     new List<char>{'#','#','#','#','#','#','#'}};
+        //public override List<List<char>> roomRaw => MazeGeneration.GenerateMaze(30, 30);
+         public override List<List<char>> roomRaw => new List<List<char>>(){
+            new List<char>{'#','#','#','#','#','#','#'},
+            new List<char>{'#',' ',' ',' ',' ',' ','#'},
+            new List<char>{'#',' ','*','*',' ','#','#'},
+            new List<char>{'#',' ','*',' ','#'},
+            new List<char>{' ',' ','*',' ',' ','#','#','#','#','#'},
+            new List<char>{'#',' ',' ',' ',' ',' ',' ',' ',' ','#'},
+            new List<char>{'#',' ','!','#',' ',' ','#','#','#','#'},
+            new List<char>{'#',' ','#','#',' ',' ','#'},
+            new List<char>{'#',' ',' ',' ',' ',' ','#'},
+            new List<char>{'#',' ',' ',' ',' ',' ','#'},
+            new List<char>{'#',' ',' ',' ',' ',' ','#'},
+            new List<char>{'#',' ',' ',' ',' ',' ','#'},
+            new List<char>{'#','#','#','#','#','#','#'}};
 
 
 

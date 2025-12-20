@@ -32,10 +32,10 @@ namespace LibCast {
         //Game scaling 
         public static int windowWidth = 1920;
         public static int windowHeight = 1080;
-        public static int bufferWidth = 1920;
-        public static int bufferHeight = 1080;
-        public static int gameWidth = 192;
-        public static int gameHeight = 108;
+        public static int bufferWidth = 2560;
+        public static int bufferHeight = 1440;
+        public static int gameWidth = 256;
+        public static int gameHeight = 144;
         public static int pixelScale = 10;
         public static RenderTexture2D target;
         public static double scale;
@@ -52,7 +52,7 @@ namespace LibCast {
         public static int targetFPS = 60;
         public static bool pause = false;
 
-        public static Font textFont;
+        public static Font smallTextFont;
 
         public static List<List<Pixel>> screen = new List<List<Pixel>>();
 
@@ -62,17 +62,19 @@ namespace LibCast {
 
         public static bool showFPS = true;
 
+        public static bool resized = false;
+
 
         public static void Init() {
             Raylib.SetConfigFlags(ConfigFlags.ResizableWindow | ConfigFlags.VSyncHint);
             Raylib.InitWindow(windowWidth, windowHeight, "Libcast");
             Raylib.SetWindowMinSize(640, 360);
-            target = Raylib.LoadRenderTexture(bufferWidth, bufferHeight);
-            textFont = Raylib.LoadFontEx("src/assets/font/consolas.ttf", 16, null, 0);
-            Raylib.SetTextureFilter(target.Texture, TextureFilter.Point);
+            ApplyBuffer();
+            smallTextFont = Raylib.LoadFontEx("src/assets/font/consolas.ttf", 16, null, 0);
             Raylib.SetTargetFPS(targetFPS);
 
         }
+
 
         public static void LoopStart() {
             timeCounter += deltaTime;
@@ -110,7 +112,11 @@ namespace LibCast {
             );
             Raylib.EndDrawing();
 
-            if (Raylib.IsKeyPressed(KeyboardKey.F11)) {
+            if (Raylib.IsKeyPressed(KeyboardKey.F11) || resized) {
+                if(resized) {
+                    Console.WriteLine("RESIZING AUTO");
+                }
+                resized = false;
                 Raylib.ToggleBorderlessWindowed();
             }
 
@@ -133,7 +139,7 @@ namespace LibCast {
                     Raylib.DrawRectangle(x * pixelScale, y * pixelScale, pixelScale, pixelScale, screen[y][x].fillColor);
                     if (screen[y][x].character != ' ') {
                         for (int i = 0; i < 5; i++) {
-                            Raylib.DrawTextEx(textFont, screen[y][x].character.ToString(), new Vector2(x * pixelScale, y * pixelScale + 5), Screen.pixelScale * 2, 0, screen[y][x].strokeColor);
+                            Raylib.DrawTextEx(smallTextFont, screen[y][x].character.ToString(), new Vector2(x * pixelScale, y * pixelScale + 5), Screen.pixelScale * 2, 0, screen[y][x].strokeColor);
                         }
                     }
                 }
@@ -223,6 +229,7 @@ namespace LibCast {
                 Pixel pixel = new Pixel(screen[y][xOffset].fillColor, strokeColor, character);
                 screen[y][x + xOffset] = pixel;
                 xOffset++;
+
             }
         }
 
@@ -313,5 +320,85 @@ namespace LibCast {
         //         }
         //     }
         // }
+
+        public static void SetWindowSize(int windowWidth, int windowHeight) {
+            Screen.windowWidth = windowWidth;
+            Screen.windowHeight = windowHeight;
+            Close();
+            Program.Init();
+        }
+
+        public static void SetFullscreen(bool fullscreen) {
+            Raylib.SetWindowState(ConfigFlags.ResizableWindow);
+            Raylib.SetWindowPosition(0, 50);
+            if(fullscreen != Raylib.IsWindowState(ConfigFlags.BorderlessWindowMode)) {
+                Raylib.ToggleBorderlessWindowed();
+            }
+        }
+
+        public static void ApplyScreenSettings(int windowWidth, int windowHeight, int bufferWidth, int bufferHeight, int gameWidth, int gameHeight, bool fullscreen) {
+            if(Raylib.IsWindowState(ConfigFlags.BorderlessWindowMode)) {
+                Raylib.ToggleBorderlessWindowed();
+            }
+            Raylib.SetWindowState(ConfigFlags.ResizableWindow);
+            Raylib.SetWindowPosition(0, 50);
+            SetBufferSize(bufferWidth, bufferHeight);
+            SetWindowSize(windowWidth, windowHeight);
+            SetGameSize(gameWidth, gameHeight);
+            SetFullscreen(fullscreen);
+        }
+
+        public static void ApplyScreenSettings(int[] dimensions, bool fullscreen) {
+            if(dimensions.Length < 6) {
+                throw new Exception("Dimensions passed invalid length");
+            }
+            ApplyScreenSettings(dimensions[0], dimensions[1], dimensions[2], dimensions[3], dimensions[4], dimensions[5], fullscreen);
+        }
+
+        public static void SetGameSize(int gameWidth, int gameHeight) {
+            Screen.gameWidth = gameWidth;
+            Screen.gameHeight = gameHeight;
+        }
+
+        public static void SetGameSize(int[] dimensions) {
+            if(dimensions.Length < 2) {
+                throw new Exception("Dimensions passed invalid length");
+            }
+            SetGameSize(dimensions[0], dimensions[1]);
+        }
+
+        public static void SetBufferSize(int bufferWidth, int bufferHeight) {
+            Screen.bufferWidth = bufferWidth;
+            Screen.bufferHeight = bufferHeight;
+        }
+
+        public static void SetBufferSize(int[] dimensions) {
+            if(dimensions.Length < 2) {
+                throw new Exception("Dimensions passed invalid length");
+            }
+            SetBufferSize(dimensions[0], dimensions[1]);
+        }
+
+
+        public static void ApplyBuffer() {
+            target = Raylib.LoadRenderTexture(bufferWidth, bufferHeight);
+            Raylib.SetTextureFilter(target.Texture, TextureFilter.Point);
+        }
+
+        public static void ApplyBuffer(int bufferWidth, int bufferHeight) {
+            SetBufferSize(bufferWidth, bufferHeight);
+            ApplyBuffer();
+        }
+
+        public static void ApplyBuffer(int[] dimensions) {
+            if(dimensions.Length < 2) {
+                throw new Exception("Dimensions passed invalid length");
+            }
+            SetBufferSize(dimensions[0], dimensions[1]);
+        }
+
+        public static void SetPixelScale(int pixelScale) {
+            Screen.pixelScale = pixelScale;
+        }
     }
 }

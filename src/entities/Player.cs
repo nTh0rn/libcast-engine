@@ -19,6 +19,9 @@ namespace LibCast {
 
 
         public override bool Loop() {
+            if(UI.gameState != GameState.PLAY) {
+                return true;
+            }
             if (KeyDown(KeyboardKey.J)) {
                 direction += (KeyDown(KeyboardKey.LeftShift) ? 6 : 3)*Screen.deltaTime;
             }
@@ -58,8 +61,10 @@ namespace LibCast {
         private void MouseControl() {
             Vector2 mouseDelta = Raylib.GetMouseDelta();
             direction -= mouseDelta[0]*Screen.deltaTime;
-            Raylib.SetMousePosition(Screen.gameWidth/2,Screen.gameHeight/2);
-
+            Raylib.SetMousePosition(Screen.windowWidth/2,Screen.windowHeight/2);
+            if(!Raylib.IsCursorHidden()) {
+                Raylib.HideCursor();
+            }
             pitch -= mouseDelta[1]*Screen.deltaTime;
             if(pitch > 42) pitch = 42;
             if(pitch < -42) pitch = -42;

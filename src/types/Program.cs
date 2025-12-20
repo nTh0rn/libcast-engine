@@ -1,13 +1,12 @@
 ﻿
+using System.Dynamic;
+
 namespace LibCast {
     class Program {
         [STAThread]
         public static void Main() {
-            Screen.Init();
-            Screen.Resize();
-            Terminal.Resize();
-            Game.Init();
-
+            
+            Init();
             while (!Raylib.WindowShouldClose()) {
                 Screen.LoopStart();
                 Game.Loop();
@@ -17,6 +16,14 @@ namespace LibCast {
             }
 
             Screen.Close();
+        }
+
+        public static void Init() {
+            Screen.Init();
+            Screen.Resize();
+            Terminal.Resize();
+            Game.Init();
+            Raylib.SetExitKey(KeyboardKey.F12);
         }
     }
 }

@@ -26,6 +26,7 @@ namespace LibCast {
             room.Loop();
             Screen.DrawFPS();
             //Terminal.GetUserCommand();
+            UI.Go();
             
         }
     }
