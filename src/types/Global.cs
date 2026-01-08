@@ -16,5 +16,8 @@ namespace LibCast {
         public static double DistanceBetween(Entity entity1, Entity entity2) {
             return DistanceBetween(entity1.x, entity1.y, entity2.x, entity2.y);
         }
+
+        public static Random random = new Random();
+
     }
 }

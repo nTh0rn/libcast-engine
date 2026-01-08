@@ -24,6 +24,7 @@ namespace LibCast {
             Terminal.Resize();
             Game.Init();
             Raylib.SetExitKey(KeyboardKey.F12);
+            Screen.SetFullscreen(false);
         }
     }
 }

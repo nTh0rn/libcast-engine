@@ -1,36 +1,16 @@
 namespace LibCast {
+    using System.Numerics;
     using static GameState;
     using static Screen;
+
     public enum GameState {
-            PLAY,
-            PAUSE,
-            SETTINGS,
-            MAINMENU,
-        }
-
-        public enum PauseState {
-            CONTINUE,
-            SETTINGS,
-            EXIT
-        }
-
-        public enum PlayState {
-            START,
-            EXIT
-        }
-
-        public enum SettingsState {
-            RESOLUTION,
-            FULLSCREEN,
-            FOV,
-            APPLY,
-            EXIT
-        }
+        PLAY,
+        PAUSE,
+        SETTINGS,
+        MAINMENU,
+    }
 
     public static class UI {
-        
-
-        
 
         /**
         1920x1080 16/9 50%
@@ -50,48 +30,100 @@ namespace LibCast {
         public static int[] gameDimensions = {256, 144};
         public static int resolution = 2;
 
-        public static GameState gameState = PLAY;
-        public static PauseState pauseState = PauseState.CONTINUE;
-        public static SettingsState settingsState = SettingsState.RESOLUTION;
+        public static GameState gameState = MAINMENU;
+
+        public static List<MouseCollision> mouseCollisions = new List<MouseCollision>();
 
         public static int settingsStateLength = Enum.GetNames(typeof(SettingsState)).Length;
+
+        public static int mouseX, mouseY;
 
 
         
 
         public static void Go() {
+            UpdateMouseXY();
             switch(gameState) {
                 case PLAY:
-                    PlayMenu();
+                    PlayUI.Loop();
                     break;
                 case PAUSE:
-                    PauseMenu.Draw();
+                    PauseUI.Loop();
                     break;
                 case SETTINGS:
-                    //SettingsMenu.Draw();
+                    SettingsUI.Loop();
                     break;
                 case MAINMENU:
-                    //MainMenu.Draw();
+                    MainMenuUI.Loop();
+                    break;
+            }
+            MouseCollision mouseCollision = screen[mouseY][mouseX].collisionFamily;
+            if(mouseCollision != null) {
+                mouseCollision.Hover();
+                if(Raylib.IsMouseButtonPressed(MouseButton.Left)) {
+                    mouseCollision.Click();
+                }
+            }
+            
+        }
+
+        public static void SetGameState(GameState state) {
+            gameState = state;
+            switch(gameState) {
+                case PLAY:
+                    PlayUI.ApplySizing();
+                    break;
+                case PAUSE:
+                    PauseUI.ApplySizing();
+                    break;
+                case SETTINGS:
+                    SettingsUI.ApplySizing();
+                    break;
+                case MAINMENU:
+                    MainMenuUI.ApplySizing();
                     break;
             }
         }
 
-        public static void PlayMenu() {
-            if(gameWidth != gameDimensions[0] || gameHeight != gameDimensions[1]) {
-                ApplyBuffer(gameDimensions[0]*10, gameDimensions[1]*10);
-                SetGameSize(gameDimensions);
-            }
-            if(KeyPressed(KeyboardKey.Escape)) {
-                gameState = PAUSE;
-                return;
-            }
-            return;
+        public static void NextState<TEnum>(ref TEnum state) where TEnum : struct, Enum {
+            var states = (TEnum[])Enum.GetValues(typeof(TEnum));
+            int index = Array.IndexOf(states, state);
+            if (index < 0) index = 0;
+            state = states[(index + 1) % states.Length];
         }
 
-        public static void PlayApplySizing() {
-            ApplyBuffer(2560, 1440);
-            SetGameSize(256, 144);
+        public static void PrevState<TEnum>(ref TEnum state) where TEnum : struct, Enum {
+            var states = (TEnum[])Enum.GetValues(typeof(TEnum));
+            int index = Array.IndexOf(states, state);
+            if (index < 0) index = 0;
+            state = states[(index - 1 + states.Length) % states.Length];
         }
 
+        public static Vector2 GetMousePosition() {
+
+            int windowWidth  = Raylib.GetScreenWidth();
+            int windowHeight = Raylib.GetScreenHeight();
+
+            float scale = Math.Min(
+                (float)windowWidth  / gameWidth,
+                (float)windowHeight / gameHeight
+            );
+
+            float offsetX = (windowWidth  - gameWidth  * scale) * 0.5f;
+            float offsetY = (windowHeight - gameHeight * scale) * 0.5f;
+
+            Vector2 mouse = Raylib.GetMousePosition();
+            return new Vector2((mouse.X - offsetX) / scale, (mouse.Y - offsetY) / scale);
+        }
+
+        public static void UpdateMouseXY() {
+            Vector2 mousePos = GetMousePosition();
+            mouseX = (int)mousePos.X;
+            mouseY = (int)mousePos.Y;
+            if(mouseX < 0) mouseX = 0;
+            if(mouseX > gameWidth-1) mouseX = gameWidth-1;
+            if(mouseY < 0) mouseY = 0;
+            if(mouseY > gameHeight-1) mouseY = gameHeight-1;
+        }
     }
 }

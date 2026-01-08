@@ -1,9 +1,11 @@
 namespace LibCast {
-    public class TallCell : WallCell {
-        public override string? texture { get; set; } = "src/assets/textures/shai.png";
-        public TallCell(double x, double y, char character, Color color) : base(x, y, character, color) {
-            floorTexture = "src/assets/textures/minecraft.png";
-            ceilingTexture = "src/assets/textures/wall_brick.png";
+    public class TallCell : RoomCell {
+        public TallCell(double x, double y, char character) : base(x, y, character) {
+            texture.SetOutTextures("src/assets/textures/tallme.png");
+            texture.SetInTextures("src/assets/textures/tallme.png");
+
+            //floorTexture = "src/assets/textures/minecraft.png";
+            //ceilingTexture = "src/assets/textures/wall_brick.png";
         }
     }
 }

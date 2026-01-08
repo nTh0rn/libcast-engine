@@ -3,14 +3,16 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace LibCast {
-    public class Player : Entity {
+    public class Player : Raycastable {
         public override bool running { get; set; } = true;
         public override double direction { get; set; } = 0;
         public override double radius { get; set; } = 0.10;
-        public double pitch {get; set;} = 0;
-        public double mouseSensitivity = 1;
-
-        private double traversalScale = 10;
+        public override double pitch {get; set;} = 0;
+        public override int pitchRange {get; set;} = 42;
+        public double mouseSensitivity {get; set;} = 1;
+        public double gravityAcceleration {get; set;} = -.2;
+        public double gravityVelocity {get; set;} = 0;
+        private double traversalScale {get; set;}  = 10;
 
         public Player(int x, int y) {
             this.x = x;
@@ -19,24 +21,26 @@ namespace LibCast {
 
 
         public override bool Loop() {
-            if(UI.gameState != GameState.PLAY) {
-                return true;
-            }
-            if (KeyDown(KeyboardKey.J)) {
-                direction += (KeyDown(KeyboardKey.LeftShift) ? 6 : 3)*Screen.deltaTime;
-            }
-            if (KeyDown(KeyboardKey.L)) {
-                direction -= (KeyDown(KeyboardKey.LeftShift) ? 6 : 3)*Screen.deltaTime;
-            }
-            if (KeyDown(KeyboardKey.I)) {
-                pitch += (KeyDown(KeyboardKey.LeftShift) ? 6 : 3)*Screen.deltaTime;
-                if(pitch > 42) pitch = 42;
-            }
-            if (KeyDown(KeyboardKey.K)) {
-                pitch -= (KeyDown(KeyboardKey.LeftShift) ? 6 : 3)*Screen.deltaTime;
-            }
+
+            
 
             MouseControl();
+            
+            if (KeyDown(KeyboardKey.J) || KeyDown(KeyboardKey.Left)) {
+                direction += (KeyDown(KeyboardKey.LeftShift) ? 6 : 3)*Screen.deltaTime;
+            }
+            if (KeyDown(KeyboardKey.L) || KeyDown(KeyboardKey.Right)) {
+                direction -= (KeyDown(KeyboardKey.LeftShift) ? 6 : 3)*Screen.deltaTime;
+            }
+            if (KeyDown(KeyboardKey.I) || KeyDown(KeyboardKey.Up)) {
+                pitch += (KeyDown(KeyboardKey.LeftShift) ? 6 : 3)*Screen.deltaTime;
+                if(pitch > pitchRange) pitch = pitchRange;
+            }
+            if (KeyDown(KeyboardKey.K) || KeyDown(KeyboardKey.Down)) {
+                pitch -= (KeyDown(KeyboardKey.LeftShift) ? 6 : 3)*Screen.deltaTime;
+                if(pitch < -pitchRange) pitch = -pitchRange;
+            }
+
 
             if (KeyDown(KeyboardKey.A)) {
                 moveDirection(direction + 90);
@@ -49,6 +53,20 @@ namespace LibCast {
             }
             if (KeyDown(KeyboardKey.S)) {
                 moveDirection(direction - 180);
+            }
+
+            if(KeyPressed(KeyboardKey.Space)) {
+                gravityVelocity = 5;
+            }
+
+            
+            z += gravityVelocity * Screen.deltaTime;
+
+            gravityVelocity += gravityAcceleration;
+
+            if(z <= 0) {
+                z = 0;
+                gravityVelocity = 0;
             }
 
 
@@ -66,8 +84,8 @@ namespace LibCast {
                 Raylib.HideCursor();
             }
             pitch -= mouseDelta[1]*Screen.deltaTime;
-            if(pitch > 42) pitch = 42;
-            if(pitch < -42) pitch = -42;
+            if(pitch > pitchRange) pitch = pitchRange;
+            if(pitch < -pitchRange) pitch = -pitchRange;
 
         }
         
@@ -103,16 +121,12 @@ namespace LibCast {
         private bool IsValidMove(int dirx, int diry) {
             int ix = (int)(x+radius*dirx), iy = (int)(y+radius*diry);
             if(iy < 0 || iy >= Game.room.room.Count || ix < 0 || ix >= Game.room.room[iy].Count) return false;
-            if(Game.room.room[iy][ix] is not EmptyCell) return false;
+            if(Game.room.room[iy][ix] is SolidCell) return false;
             
             foreach(Entity entity in Game.room.entities) {
                 if(entity != this && entity.CollisionEntity(this)) return false;
             }
             return true;
-        }
-        
-        private double DistanceToPoint(double px, double py) {
-            return Math.Sqrt(Math.Pow(x - px, 2) + Math.Pow(y - py, 2));
         }
 
         public void DrawPitch(int drawX, int drawY) {

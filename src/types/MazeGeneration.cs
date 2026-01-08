@@ -25,7 +25,7 @@ namespace LibCast {
             for (int i = 0; i < height; i++) {
                 cells.Add(new List<RoomCell>());
                 for (int j = 0; j < width; j++) {
-                    cells[i].Add(new WallCell(j, i, '#', Color.Gray));
+                    cells[i].Add(new WallCell(j, i, 'a'));
                 }
             }
             MazeCell firstCell = new MazeCell(1, 1);

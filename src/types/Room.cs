@@ -1,25 +1,77 @@
 
 namespace LibCast {
 
+    public struct TextureMap {
+        public string? westOut = null;
+        public string? eastOut = null;
+        public string? northOut = null;
+        public string? southOut = null;
+        public string? westIn = null;
+        public string? eastIn = null;
+        public string? northIn = null;
+        public string? southIn = null;
+        public string? top = null;
+        public string? bottom = null;
+
+        public TextureMap(string? top = null, string? bottom = null, string? westOut = null, string? eastOut = null, string? northOut = null, string? southOut = null, string? westIn = null, string? eastIn = null, string? northIn = null, string? southIn = null) {
+            this.top = top;
+            this.bottom = bottom;
+            this.westOut = westOut;
+            this.eastOut = eastOut;
+            this.northOut = northOut;
+            this.southOut = southOut;
+            this.westIn = westIn;
+            this.eastIn = eastIn;
+            this.northIn = northIn;
+            this.southIn = southIn;
+        }
+
+        public void SetOutTextures(string texture) {
+            westOut = texture;
+            eastOut = texture;
+            northOut = texture;
+            southOut = texture;
+        }
+
+        public void SetInTextures(string texture) {
+            westIn = texture;
+            eastIn = texture;
+            northIn = texture;
+            southIn = texture;
+        }
+
+        public void SetAllWalls(string texture) {
+            SetInTextures(texture);
+            SetOutTextures(texture);
+        }
+
+        public void SetBottomTexture(string texture) {
+            bottom = texture;
+        }
+
+        public void SetTopTexture(string texture) {
+            top = texture;
+        }
+
+    }
+
     public abstract class RoomCell {
         public char character;
         public double x;
         public double y;
-        public string? floorTexture = null;
-        public string? ceilingTexture = null;
+        public TextureMap texture;
+        public bool stopRay = false;
 
         public RoomCell(double x, double y, char character) {
             this.x = x;
             this.y = y;
             this.character = character;
+            texture = new TextureMap();
         }
     }
 
-    public class WallCell : RoomCell {
-        public Color color { get; set; }
-        public virtual string? texture { get; set; }
-        public WallCell(double x, double y, char character, Color color) : base(x, y, character) {
-            this.color = color;
+    public class WallCell : SolidCell {
+        public WallCell(double x, double y, char character) : base(x, y, character) {
         }
     }
 
@@ -27,24 +79,27 @@ namespace LibCast {
         public PlayerCell(double x, double y, char character) : base(x, y, character) {}
     }
 
+    public class SolidCell : RoomCell {
+        public SolidCell(double x, double y, char character) : base(x, y, character) {}
+    }
+
     public class EmptyCell : RoomCell {
         public EmptyCell(double x, double y, char character) : base(x, y, character) {
-            floorTexture = "src/assets/textures/minecraft.png";
-            ceilingTexture = "src/assets/textures/wall_brick.png";
+            //floorTexture = "src/assets/textures/dark_cobblestone.png";
+            //ceilingTexture = "src/assets/textures/dark_brick_wall.png";
         }
     }
 
     public class SpecialFloorCell : EmptyCell {
         public SpecialFloorCell(double x, double y, char character) : base(x, y, character) {
-            floorTexture = "src/assets/textures/wall_old.png";
-            ceilingTexture = "src/assets/textures/shai.png";
+            texture = new TextureMap("src/assets/textures/wall_old.png", "src/assets/textures/shai.png");
         }
     }
 
     public abstract class Room {
         public abstract List<List<char>> roomRaw { get; }
         public List<List<RoomCell>> room = new List<List<RoomCell>>(){};
-
+        public abstract string? skyboxTexture {get;}
         public abstract string name { get; }
         public List<Entity> entities = new List<Entity>();
         public Dictionary<string, Color[,]> textures = new Dictionary<string, Color[,]>();
@@ -77,9 +132,11 @@ namespace LibCast {
         public RoomCell ParseRoomChar(char character, int x, int y) {
             switch (character) {
                 case '#':
-                    return new BrickCell(x, y, character, Color.Black);
+                    return new DarkBrickWall(x, y, character);
                 case '!':
-                    return new TallCell(x, y, character, Color.Black);
+                    return new TallCell(x, y, character);
+                case 'a':
+                    return new DoorCell(x, y, character);
                 case ' ':
                     return new EmptyCell(x, y, character);
                 case '*':
@@ -132,9 +189,16 @@ namespace LibCast {
             // Load wall textures
             foreach (List<RoomCell> row in room) {
                 foreach (RoomCell cell in row) {
-                    if (cell is WallCell) {
-                        LoadTextureFromPath(((WallCell)cell).texture);
-                    }
+                    LoadTextureFromPath(cell.texture.top);
+                    LoadTextureFromPath(cell.texture.bottom);
+                    LoadTextureFromPath(cell.texture.westOut);
+                    LoadTextureFromPath(cell.texture.eastOut);
+                    LoadTextureFromPath(cell.texture.northOut);
+                    LoadTextureFromPath(cell.texture.southOut);
+                    LoadTextureFromPath(cell.texture.westIn);
+                    LoadTextureFromPath(cell.texture.eastIn);
+                    LoadTextureFromPath(cell.texture.northIn);
+                    LoadTextureFromPath(cell.texture.southIn);
                 }
             }
 
@@ -142,13 +206,9 @@ namespace LibCast {
             foreach (Entity entity in entities) {
                 LoadTextureFromPath(entity.texture);
             }
-            
-            // Load floor and ceiling textures from all cells
-            foreach (List<RoomCell> row in room) {
-                foreach (RoomCell cell in row) {
-                    LoadTextureFromPath(cell.floorTexture);
-                    LoadTextureFromPath(cell.ceilingTexture);
-                }
+
+            if(skyboxTexture != null) {
+                LoadTextureFromPath(skyboxTexture);
             }
         }
 
