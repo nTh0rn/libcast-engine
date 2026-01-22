@@ -2,7 +2,7 @@ namespace LibCast {
     public class RoomDefault : Room {
         public override string name => "rmDefault";
         //public override List<List<char>> roomRaw => MazeGeneration.GenerateMaze(100, 100);
-         public override List<List<char>> roomRaw => new List<List<char>>(){
+         public override List<List<char>> roomAsArray => new List<List<char>>(){
             new List<char>{'#','#','#','#','#','#','#'},
             new List<char>{'#',' ',' ',' ',' ',' ','#'},
             new List<char>{'#',' ','*','*',' ','#','#'},

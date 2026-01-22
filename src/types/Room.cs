@@ -98,8 +98,8 @@ namespace LibCast {
     }
 
     public abstract class Room {
-        public abstract List<List<char>> roomRaw { get; }
-        public List<List<RoomCell>> room = new List<List<RoomCell>>(){};
+        public abstract List<List<char>> roomAsArray { get; }
+        public Dictionary<(int, int), RoomCell> room = new Dictionary<(int, int), RoomCell>();
         public abstract string? skyboxTexture {get;}
         public abstract string name { get; }
         public List<Entity> entities = new List<Entity>();
@@ -108,19 +108,12 @@ namespace LibCast {
 
 
         public Room() {
-            var raw = roomRaw;
-            room = new List<List<RoomCell>>();
-            for (int i = 0; i < raw.Count; i++) {
-                room.Add(new List<RoomCell>());
-                for (int j = 0; j < raw[i].Count; j++) {
-                    room[i].Add(ParseRoomChar(raw[i][j], j, i));
-                }
-            }
-            Console.WriteLine("Printing room test");
-            foreach (List<RoomCell> row in room) {
-                Console.WriteLine();
-                foreach (RoomCell col in row) {
-                    Console.Write(col.character.ToString());
+            
+            var raw = roomAsArray;
+            room = new Dictionary<(int, int), RoomCell>();
+            for(int y = 0; y < raw.Count; y++) {
+                for(int x = 0; x < raw[y].Count; x++) {
+                room.Add((x, y), ParseRoomChar(raw[y][x], x, y));
                 }
             }
             foreach (Entity entity in entities) {
@@ -147,14 +140,6 @@ namespace LibCast {
                 default:
                     throw new Exception("Unaccounted for room cell character.");
             }
-        }
-
-        public int getWidth(int y) {
-            return room[y].Count;
-        }
-
-        public int getHeight() {
-            return room.Count;
         }
 
         
@@ -188,19 +173,17 @@ namespace LibCast {
             textures = new Dictionary<string, Color[,]>();
             
             // Load wall textures
-            foreach (List<RoomCell> row in room) {
-                foreach (RoomCell cell in row) {
-                    LoadTextureFromPath(cell.texture.top);
-                    LoadTextureFromPath(cell.texture.bottom);
-                    LoadTextureFromPath(cell.texture.westOut);
-                    LoadTextureFromPath(cell.texture.eastOut);
-                    LoadTextureFromPath(cell.texture.northOut);
-                    LoadTextureFromPath(cell.texture.southOut);
-                    LoadTextureFromPath(cell.texture.westIn);
-                    LoadTextureFromPath(cell.texture.eastIn);
-                    LoadTextureFromPath(cell.texture.northIn);
-                    LoadTextureFromPath(cell.texture.southIn);
-                }
+            foreach (var cell in room) {
+                LoadTextureFromPath(cell.Value.texture.top);
+                LoadTextureFromPath(cell.Value.texture.bottom);
+                LoadTextureFromPath(cell.Value.texture.westOut);
+                LoadTextureFromPath(cell.Value.texture.eastOut);
+                LoadTextureFromPath(cell.Value.texture.northOut);
+                LoadTextureFromPath(cell.Value.texture.southOut);
+                LoadTextureFromPath(cell.Value.texture.westIn);
+                LoadTextureFromPath(cell.Value.texture.eastIn);
+                LoadTextureFromPath(cell.Value.texture.northIn);
+                LoadTextureFromPath(cell.Value.texture.southIn);
             }
 
             // Load entity textures
@@ -214,13 +197,10 @@ namespace LibCast {
         }
 
         public void DrawTopDown(int x, int y) {
-            for(int i = 0; i < room.Count; i++) {
-                for(int j = 0; j < room[i].Count; j++) {
-                    RoomCell cell = room[i][j];
-                    Color cellColor = new Color(cell.character*10 % 255, cell.character*100 % 255, cell.character*1000 % 255);
-                    Screen.Fill(cellColor);
-                    Screen.DrawRect(x+j*3, y+i*3, 3, 3);
-                }
+            foreach (var cell in room) {
+                Color cellColor = new Color(cell.Value.character*10 % 255, cell.Value.character*100 % 255, cell.Value.character*1000 % 255);
+                Screen.Fill(cellColor);
+                Screen.DrawRect(x+cell.Key.Item1*3, y+cell.Key.Item2*3, 3, 3);
             }
 
             if(player != null) {

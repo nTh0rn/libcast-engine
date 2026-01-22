@@ -1,7 +1,7 @@
 namespace LibCast {
     public class RoomForest : Room {
         public override string name => "rmForest";
-        public override List<List<char>> roomRaw => GenerateForest(100,100, 500);
+        public override List<List<char>> roomAsArray => GenerateForest(100,100, 500);
         public override string? skyboxTexture => "src/assets/textures/sky.png";
 
         public RoomForest() : base(){

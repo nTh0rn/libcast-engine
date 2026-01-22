@@ -120,8 +120,9 @@ namespace LibCast {
         
         private bool IsValidMove(int dirx, int diry) {
             int ix = (int)(x+radius*dirx), iy = (int)(y+radius*diry);
-            if(iy < 0 || iy >= Game.room.room.Count || ix < 0 || ix >= Game.room.room[iy].Count) return false;
-            if(Game.room.room[iy][ix] is SolidCell) return false;
+            if(!Game.room.room.ContainsKey((ix, iy))) return false;
+            //if(iy < 0 || iy >= Game.room.room.Count || ix < 0 || ix >= Game.room.room[iy].Count) return false;
+            if(Game.room.room[(ix, iy)] is SolidCell) return false;
             
             foreach(Entity entity in Game.room.entities) {
                 if(entity != this && entity.CollisionEntity(this)) return false;

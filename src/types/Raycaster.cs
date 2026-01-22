@@ -81,8 +81,7 @@ namespace LibCast {
         }
 
         private static bool inBounds(double x, double y) {
-            return y >= 0 && y < room.getHeight() &&
-                x >= 0 && x < room.getWidth((int)y);
+            return room.room.ContainsKey(((int)x, (int)y));
         }
 
         private static WallInfo[] CastRay(double dx, double dy, int mapX, int mapY, double povX, double povY, double rayAngle, double viewAngle) {
@@ -120,7 +119,7 @@ namespace LibCast {
                 int prevX = mapX - (side == 0 ? stepX : 0);
                 int prevY = mapY - (side == 1 ? stepY : 0);
                 if (inBounds(prevX, prevY)) {
-                    RoomCell prevCell = room.room[prevY][prevX];
+                    RoomCell prevCell = room.room[(prevX, prevY)];
                     if (prevCell.texture.westIn != null || prevCell.texture.northIn != null) {
                         string? innerTex = (side == 0) ? ((stepX > 0) ? prevCell.texture.eastIn : prevCell.texture.westIn)
                                                     : ((stepY > 0) ? prevCell.texture.southIn : prevCell.texture.northIn);
@@ -131,7 +130,7 @@ namespace LibCast {
                 }
 
                 // Outer Face Check
-                RoomCell nextCell = room.room[mapY][mapX];
+                RoomCell nextCell = room.room[(mapX, mapY)];
                 if (nextCell.stopRay) {
                     string? solidTex;
                     if (side == 0) solidTex = (stepX > 0) ? nextCell.texture.westOut : nextCell.texture.eastOut;
@@ -231,7 +230,7 @@ namespace LibCast {
                 int cellY = (int)worldY;
                 if (!inBounds(cellX, cellY)) continue;
 
-                RoomCell cell = room.room[cellY][cellX];
+                RoomCell cell = room.room[(cellX, cellY)];
                 string? texKey = isFloor ? cell.texture.bottom : cell.texture.top;
                 
                 DrawTexturedSurface(texKey, worldX, worldY, rowDistance, y, column, isFloor);
