@@ -18,7 +18,7 @@ namespace LibCast {
         public static PauseUIExitButton exitButton = new PauseUIExitButton();
 
         public static void Loop() {
-            Raycaster.Go(Game.room.player);
+            Raycaster.Go(Game.room.player, Game.room);
             DrawBackground(0, 0, 0, 100);
             DrawText("Why the fuck u pause lol", 20, 50);
             

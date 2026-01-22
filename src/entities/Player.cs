@@ -71,7 +71,7 @@ namespace LibCast {
 
 
 
-            Raycaster.Go(this);
+            Raycaster.Go(this, Game.room);
             DrawPitch(Screen.gameWidth-1,50);
             return true;
         }
@@ -129,7 +129,7 @@ namespace LibCast {
             return true;
         }
 
-        public void DrawPitch(int drawX, int drawY) {
+        public new void DrawPitch(int drawX, int drawY) {
             int radius = 10;
             Screen.Fill(Color.Green);
             for(int i = 0; i < radius*2-2; i++) {

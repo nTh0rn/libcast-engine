@@ -13,21 +13,21 @@ namespace LibCast {
             this.fillColor = fillColor;
         }
 
-        public Pixel(Color fillColor, Color strokeColor, MouseCollision collisionFamily) {
+        public Pixel(Color fillColor, Color strokeColor, MouseCollision? collisionFamily = null) {
             this.fillColor = fillColor;
             this.strokeColor = strokeColor;
             this.character = character;
             this.collisionFamily = collisionFamily;
         }
 
-        public Pixel(Color fillColor, Color strokeColor, char character, MouseCollision collisionFamily) {
+        public Pixel(Color fillColor, Color strokeColor, char character, MouseCollision? collisionFamily = null) {
             this.fillColor = fillColor;
             this.strokeColor = strokeColor;
             this.character = character;
             this.collisionFamily = collisionFamily;
         }
 
-        public Pixel(Color fillColor, Color strokeColor, int depth, char character, MouseCollision collisionFamily) {
+        public Pixel(Color fillColor, Color strokeColor, int depth, char character, MouseCollision? collisionFamily = null) {
             this.fillColor = fillColor;
             this.strokeColor = strokeColor;
             this.depth = depth;
@@ -37,11 +37,13 @@ namespace LibCast {
     }
 
     
+
+    
     public class Screen {
 
         //Game scaling 
-        public static int windowWidth = 1920;
-        public static int windowHeight = 1080;
+        public static int windowWidth = 1280;
+        public static int windowHeight = 720;
         public static int bufferWidth = 2560;
         public static int bufferHeight = 1440;
         public static int gameWidth = 256;
@@ -65,6 +67,7 @@ namespace LibCast {
         public static Font smallTextFont;
 
         public static List<List<Pixel>> screen = new List<List<Pixel>>();
+
 
         public static readonly Color emptyColor = new Color(255, 255, 255, 0);
         public static Color fillColor = Color.Black;
@@ -142,6 +145,7 @@ namespace LibCast {
 
 
         public static void Draw() {
+            
             for (int y = screen.Count - 1; y >= 0; y--) {
                 for (int x = screen[y].Count - 1; x >= 0; x--) {
                     Raylib.DrawRectangle(x * pixelScale, y * pixelScale, pixelScale, pixelScale, screen[y][x].fillColor);
@@ -152,6 +156,7 @@ namespace LibCast {
                     }
                 }
             }
+            
             //Terminal.DrawCursor();
         }
 
@@ -188,6 +193,8 @@ namespace LibCast {
             }
         }
 
+
+
         public static void DrawPixel(int x, int y, char character, Color color, int depth) {
             byte a = color.A;
             if (a != 255) {
@@ -216,6 +223,7 @@ namespace LibCast {
             if(screen[y][x].depth >= depth) {
                 DrawPixel(x, y, depth, color);
             }
+            //DrawPixel(x, y, depth, color);
         }
 
         public static void DrawPixelDepth(int x, int y, int depth) {
@@ -347,10 +355,10 @@ namespace LibCast {
         public static void DrawTexture(
             string texture,
             int x,
-            double y,
+            int y,
             int? depth = int.MaxValue,
             int width = 0,
-            double height = 0
+            int height = 0
         ) {
             Color[,] tex = Game.room.textures[texture];
             int texH = tex.GetLength(0);
@@ -361,10 +369,10 @@ namespace LibCast {
                 height = texH;
             }
             else if (width <= 0) {
-                width = (int)Math.Round(height * texW / texH);
+                width = (int)Math.Round((double)height * texW / texH);
             }
             else if (height <= 0) {
-                height = width * (double)texH / texW;
+                height = (int)(width * (double)texH / texW);
             }
 
             if (width <= 0 || height <= 0) return;
@@ -372,9 +380,9 @@ namespace LibCast {
             double invW = 1.0 / width;
             double invH = 1.0 / height;
 
-            int yStart = Math.Max(0, (int)Math.Floor(y));
+            int yStart = Math.Max(0, y);
             int yEnd   = Math.Min(Screen.gameHeight - 1,
-                                (int)Math.Ceiling(y + height) - 1);
+                                y + height - 1);
 
             for (int sx = Math.Max(0, x);
                 sx < x + width && sx < Screen.gameWidth;
@@ -391,7 +399,7 @@ namespace LibCast {
                     int texY = (int)(v * (texH - 1));
 
                     Color c = tex[texY, texX];
-                    //if (c.A == 0) continue;
+                    if (c.A == 0) continue;
                     if(depth != null) {
                         Screen.DrawPixelDepth(sx, sy, (int)depth, c);
                     } else {
@@ -425,7 +433,13 @@ namespace LibCast {
             Raylib.SetWindowState(ConfigFlags.ResizableWindow);
             Raylib.SetWindowPosition(50, 50);
             if(fullscreen != IsFullscreen()) {
-                Raylib.ToggleBorderlessWindowed();
+                if(fullscreen) {
+                Raylib.SetWindowSize(1920, 1080);
+                } else {
+                Raylib.SetWindowSize(1280, 720);
+                }
+                Raylib.ToggleFullscreen();
+                
             }
         }
 
@@ -434,12 +448,14 @@ namespace LibCast {
         }
 
         public static bool IsFullscreen() {
-            return Raylib.IsWindowState(ConfigFlags.BorderlessWindowMode);
+            //return Raylib.IsWindowState(ConfigFlags.BorderlessWindowMode);
+            return Raylib.IsWindowState(ConfigFlags.FullscreenMode);
         }
 
         public static void ApplyScreenSettings(int windowWidth, int windowHeight, int bufferWidth, int bufferHeight, int gameWidth, int gameHeight, bool fullscreen) {
             if(IsFullscreen()) {
-                Raylib.ToggleBorderlessWindowed();
+                //Raylib.ToggleBorderlessWindowed();
+                Raylib.ToggleFullscreen();
             }
             Raylib.SetWindowState(ConfigFlags.ResizableWindow);
             Raylib.SetWindowPosition(0, 50);

@@ -19,16 +19,6 @@ namespace LibCast {
 
         Steamdeck is 1280x800 16/10
         */
-        public static int[,] resolutions = new int[,]{
-            {1280, 720, 1280, 720, 10},
-            {1280, 800, 2560, 1600, 10},
-            {1920, 1080, 2560, 1440, 10}, 
-            {1920, 1200, 2560, 1600, 10},
-            {2560, 1440, 2560, 1440, 10},
-            {2560, 1600, 2560, 1600, 10}
-            };
-        public static int[] gameDimensions = {256, 144};
-        public static int resolution = 2;
 
         public static GameState gameState = MAINMENU;
 

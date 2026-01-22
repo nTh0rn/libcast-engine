@@ -3,13 +3,14 @@ namespace LibCast {
     public abstract class Entity {
         public virtual bool running { get; set; }
         public abstract bool Loop();
+        public virtual bool isTall {get; set;} = false;
         public double x;
         public double y;
         public double z;
         public virtual double direction { get; set; }
         public virtual double radius { get; set;  }
         public virtual string? texture {get; set;}
-
+        
         public bool CollisionPoint(double pointX, double pointY) {
             return Math.Sqrt(Math.Pow(x-pointX, 2)+Math.Pow(y-pointY, 2)) <= radius;
         }

@@ -87,12 +87,13 @@ namespace LibCast {
         public EmptyCell(double x, double y, char character) : base(x, y, character) {
             //floorTexture = "src/assets/textures/dark_cobblestone.png";
             //ceilingTexture = "src/assets/textures/dark_brick_wall.png";
+            texture.bottom = "src/assets/textures/grass.png";
         }
     }
 
     public class SpecialFloorCell : EmptyCell {
         public SpecialFloorCell(double x, double y, char character) : base(x, y, character) {
-            texture = new TextureMap("src/assets/textures/wall_old.png", "src/assets/textures/shai.png");
+            texture = new TextureMap("src/assets/textures/wall_old.png", "src/assets/textures/wall_brick.png");
         }
     }
 

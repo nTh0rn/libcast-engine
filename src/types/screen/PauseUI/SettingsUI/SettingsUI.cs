@@ -20,7 +20,7 @@ namespace LibCast {
         public static SettingsUIReturnButton returnButton = new SettingsUIReturnButton();
 
         public static void Loop() {
-            Raycaster.Go(Game.room.player);
+            Raycaster.Go(Game.room.player, Game.room);
             DrawBackground(0, 0, 0, 100);
             
             StartCollisionDraw(fullscreenButton);

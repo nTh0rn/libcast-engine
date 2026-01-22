@@ -21,7 +21,7 @@ namespace LibCast {
     }
 
 
-    public class Raycaster {
+    public static class Raycaster {
         
         public static int FOV = 110;
         private const double DEG2RAD = Math.PI / 180.0;
@@ -29,12 +29,16 @@ namespace LibCast {
         private const double PI_OVER_180 = Math.PI / 180.0;
         private const int maxRaySurfaces = 15;
 
-        private static Raycastable pov;
+        private static Raycastable pov = null!;
+        private static Room room = null!;
+
         private static double fovScale, pitch, wallHeightScale;
 
-        public static void Go(Raycastable view) {
+        public static void Go(Raycastable? view, Room gameRoom) {
+            if (view == null) return;
             pov = view;
-            pitch = ((Game.room.player?.pitch + Game.room.player?.z)*(Screen.gameWidth/256.0)) ?? 0.0;
+            room = gameRoom;
+            pitch = (pov.pitch + pov.z)*(Screen.gameWidth/256.0);
             fovScale = Math.Tan(FOV / 2.0 * DEG2RAD);
             wallHeightScale = Screen.gameWidth / 2.0 / fovScale;
 
@@ -53,7 +57,7 @@ namespace LibCast {
                 double dy = -Math.Sin(da * DEG2RAD);
 
                 WallInfo[] walls = CastRay(dx, dy, (int)viewX, (int)viewY, viewX, viewY, da, viewAngle);
-
+                
                 foreach (WallInfo wall in walls.Reverse()) {
                     double xOffset = wall.rx - Math.Floor(wall.rx);
                     double yOffset = wall.ry - Math.Floor(wall.ry);
@@ -63,20 +67,24 @@ namespace LibCast {
 
                     if (hitVertical) { if (dx < 0) offset = 1.0 - offset; }
                     else { if (dy > 0) offset = 1.0 - offset; }
-                    DrawFloorCeiling(wall.distance, col, da, viewAngle);
                     DrawRayTexture(wall.distance, offset, wall.texture, wall.isTall, col);
                 }
+                if(walls.Count() == 0) {
+                    DrawFloorCeiling(maxRaySurfaces*2, col, da, viewAngle);
+                } else {
+                    DrawFloorCeiling(walls[walls.GetLength(0)-1].distance, col, da, viewAngle);
+                }
             });
+
 
             DrawEntities(viewAngle);
         }
 
-        public static bool inBounds(double x, double y) {
-            return y >= 0 && y < Game.room.getHeight() &&
-                x >= 0 && x < Game.room.getWidth((int)y);
+        private static bool inBounds(double x, double y) {
+            return y >= 0 && y < room.getHeight() &&
+                x >= 0 && x < room.getWidth((int)y);
         }
 
-        // --- 4. CAST RAY (Pure / Thread-Safe) ---
         private static WallInfo[] CastRay(double dx, double dy, int mapX, int mapY, double povX, double povY, double rayAngle, double viewAngle) {
             List<WallInfo> distances = new List<WallInfo>(maxRaySurfaces);
 
@@ -112,7 +120,7 @@ namespace LibCast {
                 int prevX = mapX - (side == 0 ? stepX : 0);
                 int prevY = mapY - (side == 1 ? stepY : 0);
                 if (inBounds(prevX, prevY)) {
-                    RoomCell prevCell = Game.room.room[prevY][prevX];
+                    RoomCell prevCell = room.room[prevY][prevX];
                     if (prevCell.texture.westIn != null || prevCell.texture.northIn != null) {
                         string? innerTex = (side == 0) ? ((stepX > 0) ? prevCell.texture.eastIn : prevCell.texture.westIn)
                                                     : ((stepY > 0) ? prevCell.texture.southIn : prevCell.texture.northIn);
@@ -123,7 +131,7 @@ namespace LibCast {
                 }
 
                 // Outer Face Check
-                RoomCell nextCell = Game.room.room[mapY][mapX];
+                RoomCell nextCell = room.room[mapY][mapX];
                 if (nextCell.stopRay) {
                     string? solidTex;
                     if (side == 0) solidTex = (stepX > 0) ? nextCell.texture.westOut : nextCell.texture.eastOut;
@@ -156,7 +164,7 @@ namespace LibCast {
         }
 
         private static void DrawRayTexture(double distance, double xPos, string? stringTexture, bool isTall, int column) {
-            if (stringTexture == null || !Game.room.textures.TryGetValue(stringTexture, out var texture)) return;
+            if (stringTexture == null || !room.textures.TryGetValue(stringTexture, out var texture)) return;
 
             double height = Math.Max(1, wallHeightScale / distance) * (isTall ? 2 : 1);
             double top = (Screen.gameHeight / 2.0) - height * (isTall ? 0.75 : 0.5) + pitch;
@@ -176,8 +184,6 @@ namespace LibCast {
                 Color c = texture[texY, texX];
                 if (c.A == 0) continue;
 
-                // FIXED: Pass color directly to the draw call. 
-                // If your Screen class doesn't have this, you must add it or use a lock.
                 Screen.DrawPixelDepth(column, y, (int)(distance * 100), c); 
             }
         }
@@ -225,7 +231,7 @@ namespace LibCast {
                 int cellY = (int)worldY;
                 if (!inBounds(cellX, cellY)) continue;
 
-                RoomCell cell = Game.room.room[cellY][cellX];
+                RoomCell cell = room.room[cellY][cellX];
                 string? texKey = isFloor ? cell.texture.bottom : cell.texture.top;
                 
                 DrawTexturedSurface(texKey, worldX, worldY, rowDistance, y, column, isFloor);
@@ -233,14 +239,13 @@ namespace LibCast {
         }
 
         private static void DrawTexturedSurface(string? textureKey, double worldX, double worldY, double depthPerp, int y, int column, bool isFloor) {
-            if (textureKey == null || !Game.room.textures.TryGetValue(textureKey, out var texture)) return;
+            if (textureKey == null || !room.textures.TryGetValue(textureKey, out var texture)) return;
 
             double fracX = worldX - Math.Floor(worldX);
             double fracY = worldY - Math.Floor(worldY);
 
             if(!isFloor) {
                 fracX = 1.0-fracX;
-                //fracY = 1.0-fracY;
             }
             
             int texW = texture.GetLength(1);
@@ -258,11 +263,11 @@ namespace LibCast {
             double halfScreenWidth = Screen.gameWidth * 0.5;
             double halfScreenHeight = Screen.gameHeight * 0.5;
 
-            foreach (Entity entity in Game.room.entities) {
-                if (entity is Player || pov == null) continue;
+            List<(string texture, int x, int y, int depth, int width, double height)> entityDepthSorted = new List<(string texture, int x, int y, int depth, int width, double height)>();
 
-                string texName = entity.texture;
-                if (texName == null || !Game.room.textures.ContainsKey(texName)) continue;
+            foreach (Entity entity in room.entities) {
+                if (entity is Player || entity.texture == null) continue;
+                if (entity.texture == null || !room.textures.ContainsKey(entity.texture)) continue;
 
                 double dx = entity.x - pov.x;
                 double dy = entity.y - pov.y;
@@ -276,21 +281,37 @@ namespace LibCast {
                 double entityColumn = halfScreenWidth + Math.Tan(angleDiff * PI_OVER_180) * halfScreenWidth / fovScale;
                 double correctedDistance = Math.Max(0.01, facingCos * DistanceBetween(entity, pov));
 
-                double projectedHeight = wallHeightScale / correctedDistance;
-                int width = (int)Math.Round(projectedHeight);
+                int projectedHeight = (int)(wallHeightScale / correctedDistance);
+                int width = projectedHeight;
                 if (width <= 0) continue;
 
-                double top = halfScreenHeight - projectedHeight * 0.5 + pitch;
+                int top = (int)(halfScreenHeight - (projectedHeight * 0.5) + pitch);
                 int depth = (int)(correctedDistance * 100);
+                if(depth > 3000) continue;
                 int screenX = (int)Math.Round(entityColumn) - width / 2;
 
-                Screen.DrawTexture(texName, screenX, top, depth, width, projectedHeight);
+                if(entity.isTall) {
+                    projectedHeight*=2;
+                    top = top - (int)projectedHeight/2;
+                }
+                entityDepthSorted.Add((entity.texture, screenX, top, depth, width, projectedHeight));
+
             }
+
+            entityDepthSorted.Sort((a, b) => b.depth.CompareTo(a.depth));
+
+            foreach((string texture, int x, int y, int depth, int width, int height) entity in entityDepthSorted) {
+                //Console.WriteLine(entity.depth);
+                Screen.DrawTexture(entity.texture, entity.x, entity.y, entity.depth, entity.width, entity.height);
+            }
+
+            
         }
 
         
 
         private static void DrawSkyBox() {
+            if(room.skyboxTexture == null) return;
             double angle = pov.direction % 360.0;
             if (angle < 0) angle += 360.0;
 
@@ -306,8 +327,9 @@ namespace LibCast {
             int x = (int)((1.0 - angle / 360.0) * skyboxWidth);
 
             // draw twice for wrapping
-            Screen.DrawTexture(Game.room.skyboxTexture, -x, y, null, skyboxWidth, Screen.gameHeight + pov.pitchRange*2*Screen.gameWidth/256.0);
-            Screen.DrawTexture(Game.room.skyboxTexture, -x + skyboxWidth, y, null, skyboxWidth, Screen.gameHeight + pov.pitchRange*2*Screen.gameWidth/256.0);
+            Screen.DrawBackground(0);
+            Screen.DrawTexture(room.skyboxTexture, -x, y, null, skyboxWidth, Screen.gameHeight + pov.pitchRange*2*Screen.gameWidth/256);
+            Screen.DrawTexture(room.skyboxTexture, -x + skyboxWidth, y, null, skyboxWidth, Screen.gameHeight + pov.pitchRange*2*Screen.gameWidth/256);
         }
     }
 }
