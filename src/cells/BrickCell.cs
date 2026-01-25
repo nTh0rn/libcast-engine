@@ -1,13 +1,13 @@
 namespace LibCast {
     public class BrickCell : WallCell {
         public BrickCell(double x, double y, char character) : base(x, y, character) {
-            texture.SetOutTextures("src/assets/textures/wall_brickhigh.png");
+            texture.SetOutTextures("src/assets/textures/tree_tall.png");
         }
     }
 
     public class DarkBrickWall : WallCell {
         public DarkBrickWall(double x, double y, char character) : base(x, y, character) {
-            texture.SetOutTextures("src/assets/textures/dark_brick_wall.png");
+            texture.SetOutTextures("src/assets/textures/tree_tall.png");
             //floorTexture = "src/assets/textures/sky.png";
             //ceilingTexture = "src/assets/textures/dark_cobblestone.png";
         }

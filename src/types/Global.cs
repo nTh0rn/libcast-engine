@@ -1,6 +1,7 @@
 
 namespace LibCast {
     public class Global {
+        public static Random rng = new Random();
         public static bool KeyDown(KeyboardKey key) {
             return Raylib.IsKeyDown(key);
         }

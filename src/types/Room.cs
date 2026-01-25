@@ -1,17 +1,19 @@
 
 namespace LibCast {
 
+
+    public struct Texture {
+        public Color[,] texture;
+        public int height;
+
+        public Texture(Color[,] texture) {
+            this.texture = texture;
+            height = texture.GetLength(0);
+        }
+    }
+
     public struct TextureMap {
-        public string? westOut = null;
-        public string? eastOut = null;
-        public string? northOut = null;
-        public string? southOut = null;
-        public string? westIn = null;
-        public string? eastIn = null;
-        public string? northIn = null;
-        public string? southIn = null;
-        public string? top = null;
-        public string? bottom = null;
+        public string? westOut, eastOut, northOut, southOut, westIn, eastIn, northIn, southIn, top, bottom = null;
 
         public TextureMap(string? top = null, string? bottom = null, string? westOut = null, string? eastOut = null, string? northOut = null, string? southOut = null, string? westIn = null, string? eastIn = null, string? northIn = null, string? southIn = null) {
             this.top = top;
@@ -99,12 +101,15 @@ namespace LibCast {
 
     public abstract class Room {
         public abstract List<List<char>> roomAsArray { get; }
-        public Dictionary<(int, int), RoomCell> room = new Dictionary<(int, int), RoomCell>();
+        public Dictionary<(int worldX, int worldY), RoomCell> room = new Dictionary<(int, int), RoomCell>();
         public abstract string? skyboxTexture {get;}
         public abstract string name { get; }
-        public List<Entity> entities = new List<Entity>();
-        public Dictionary<string, Color[,]> textures = new Dictionary<string, Color[,]>();
+        public Dictionary<(int chunkX, int chunkY), List<Entity>> entities = new Dictionary<(int, int), List<Entity>>();
+        public List<Entity> entitiesInRange = new List<Entity>();
+        public Dictionary<string, Texture> textures = new Dictionary<string, Texture>();
         public Player? player = null;
+        public int renderDistance = 3;
+        public int chunkSize = 8;
 
 
         public Room() {
@@ -116,9 +121,11 @@ namespace LibCast {
                 room.Add((x, y), ParseRoomChar(raw[y][x], x, y));
                 }
             }
-            foreach (Entity entity in entities) {
-                if(entity is Player) {
-                    player = (Player)entity;
+            foreach (var entityList in entities) {
+                foreach(Entity entity in entityList.Value) {
+                    if(entity is Player) {
+                        player = (Player)entity;
+                    }
                 }
             }
         }
@@ -144,18 +151,31 @@ namespace LibCast {
 
         
 
-        private void LoadTextureFromPath(string? texturePath) {
+        private void LoadTextureFromPath(string texturePath) {
             if (texturePath == null || textures.ContainsKey(texturePath)) {
                 return;
             }
             
             if (!File.Exists(texturePath)) {
-                throw new FileNotFoundException($"Texture file not found: {texturePath}. Current directory: {Directory.GetCurrentDirectory()}");
+                texturePath = "src/assets/textures/error.png";
             }
             
             var img = Raylib.LoadImage(texturePath);
             int width = img.Width;
             int height = img.Height;
+
+            if(width % 256 != 0) {
+                img = Raylib.LoadImage("src/assets/textures/error.png");
+                width = 256;
+                height = 256;
+            }
+
+            // if(width % 256 != 0 || height % 256 != 0) {
+            //     img = Raylib.LoadImage("src/assets/textures/error.png");
+            //     width = 256;
+            //     height = 256;
+            //     return;
+            // }
             
             Color[,] pixels = new Color[height, width];
             
@@ -166,34 +186,47 @@ namespace LibCast {
             }
             
             Raylib.UnloadImage(img);
-            textures.Add(texturePath, pixels);
+
+            textures.Add(texturePath, new Texture(pixels));
         }
 
         public void LoadTextures() {
-            textures = new Dictionary<string, Color[,]>();
-            
-            // Load wall textures
-            foreach (var cell in room) {
-                LoadTextureFromPath(cell.Value.texture.top);
-                LoadTextureFromPath(cell.Value.texture.bottom);
-                LoadTextureFromPath(cell.Value.texture.westOut);
-                LoadTextureFromPath(cell.Value.texture.eastOut);
-                LoadTextureFromPath(cell.Value.texture.northOut);
-                LoadTextureFromPath(cell.Value.texture.southOut);
-                LoadTextureFromPath(cell.Value.texture.westIn);
-                LoadTextureFromPath(cell.Value.texture.eastIn);
-                LoadTextureFromPath(cell.Value.texture.northIn);
-                LoadTextureFromPath(cell.Value.texture.southIn);
+            textures = new Dictionary<string, Texture>();
+
+            string[] textureFiles = 
+            Directory.GetFiles("src/assets/textures", "*.png", SearchOption.AllDirectories);
+
+            for(int i = 0; i < textureFiles.Count(); i++) {
+                textureFiles[i] = textureFiles[i].Replace("\\", "/");
+                textureFiles[i] = textureFiles[i].Replace("\\", "/");
             }
 
-            // Load entity textures
-            foreach (Entity entity in entities) {
-                LoadTextureFromPath(entity.texture);
+            foreach(string texture in textureFiles) {
+                LoadTextureFromPath(texture);
             }
 
-            if(skyboxTexture != null) {
-                LoadTextureFromPath(skyboxTexture);
-            }
+            // // Load wall textures
+            // foreach (var cell in room) {
+            //     LoadTextureFromPath(cell.Value.texture.top);
+            //     LoadTextureFromPath(cell.Value.texture.bottom);
+            //     LoadTextureFromPath(cell.Value.texture.westOut);
+            //     LoadTextureFromPath(cell.Value.texture.eastOut);
+            //     LoadTextureFromPath(cell.Value.texture.northOut);
+            //     LoadTextureFromPath(cell.Value.texture.southOut);
+            //     LoadTextureFromPath(cell.Value.texture.westIn);
+            //     LoadTextureFromPath(cell.Value.texture.eastIn);
+            //     LoadTextureFromPath(cell.Value.texture.northIn);
+            //     LoadTextureFromPath(cell.Value.texture.southIn);
+            // }
+
+            // // Load entity textures
+            // foreach (Entity entity in entities) {
+            //     LoadTextureFromPath(entity.texture);
+            // }
+
+            // if(skyboxTexture != null) {
+            //     LoadTextureFromPath(skyboxTexture);
+            // }
         }
 
         public void DrawTopDown(int x, int y) {
@@ -216,6 +249,52 @@ namespace LibCast {
             return "->";
             if(dir < 30 || dir > 285) {
                 return "→";
+            }
+        }
+
+        public void UpdateEntitiesInRange() {
+            entitiesInRange.Clear();
+            foreach((int, int) coord in GetEntitiesInRange()) {
+                foreach(Entity entity in entities[coord]) {
+                    entitiesInRange.Add(entity);
+                }
+            }
+        }
+
+        public List<(int, int)> GetEntitiesInRange() {
+            List<(int, int)> returnEntities = new List<(int, int)>();
+            (int x, int y) playerChunk = CoordinateToChunk(player.x, player.y);
+
+            for(int x = playerChunk.x-renderDistance; x < playerChunk.x+renderDistance; x++) {
+                for(int y = playerChunk.y-renderDistance; y < playerChunk.y+renderDistance; y++) {
+                    if(entities.ContainsKey((x, y))) {
+                        returnEntities.Add((x, y));
+                    }
+                }
+            }
+            return returnEntities;
+        }
+
+
+        public (int x, int y) CoordinateToChunk(double x, double y) {
+            int cx = (int)x / chunkSize;
+            int cy = (int)y / chunkSize;
+
+            if (x < 0 && x % chunkSize != 0) cx--;
+            if (y < 0 && y % chunkSize != 0) cy--;
+
+            return (cx, cy);
+        }
+
+        public void AddEntity(Entity entity) {
+            (int, int) chunk = CoordinateToChunk(entity.x, entity.y);
+            if(!entities.ContainsKey(chunk)) {
+                entities.Add(chunk, new List<Entity>(){entity});
+            } else {
+                entities[chunk].Add(entity);
+            }
+            if(entity is Player) {
+                player = (Player)entity;
             }
         }
 

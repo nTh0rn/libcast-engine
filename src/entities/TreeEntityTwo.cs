@@ -1,13 +1,13 @@
 using Raylib_cs;
 
 namespace LibCast {
-    public class TreeEntity : Entity {
+    public class TreeEntityTwo : Entity {
         public override bool running { get; set; } = true;
         public override double direction { get; set; } = 0;
         public override double radius { get; set; } = 0.10;
         public override string? texture {get; set; } = "src/assets/textures/tree_tall.png";
 
-        public TreeEntity(double x, double y) {
+        public TreeEntityTwo(double x, double y) {
             this.x = x;
             this.y = y;
         }

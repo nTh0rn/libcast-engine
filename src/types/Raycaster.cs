@@ -8,15 +8,13 @@ namespace LibCast {
         public double distance;
         public double rx;
         public double ry;
-        public string? texture;
-        public bool isTall;
+        public string texture;
 
-        public WallInfo(double d, double x, double y, string? tex, bool tall) {
+        public WallInfo(double d, double x, double y, string tex) {
             distance = d;
             rx = x;
             ry = y;
             texture = tex;
-            isTall = tall;
         }
     }
 
@@ -47,7 +45,7 @@ namespace LibCast {
             double viewY = pov.y;
             
             DrawSkyBox();
-
+            DrawEntities(viewAngle);
             Parallel.For(0, Screen.gameWidth, col => {
                 double da = -Math.Atan((col - Screen.gameWidth / 2.0) / (Screen.gameWidth / 2.0) * fovScale) * RAD2DEG + viewAngle;
                 while (da < 0) da += 360;
@@ -55,9 +53,8 @@ namespace LibCast {
 
                 double dx = Math.Cos(da * DEG2RAD);
                 double dy = -Math.Sin(da * DEG2RAD);
-
-                WallInfo[] walls = CastRay(dx, dy, (int)viewX, (int)viewY, viewX, viewY, da, viewAngle);
-                
+                DrawFloorCeiling(col, da, viewAngle);
+                WallInfo[] walls = CastRay(dx, dy, (int)Math.Floor(viewX), (int)Math.Floor(viewY), viewX, viewY, da, viewAngle);
                 foreach (WallInfo wall in walls.Reverse()) {
                     double xOffset = wall.rx - Math.Floor(wall.rx);
                     double yOffset = wall.ry - Math.Floor(wall.ry);
@@ -67,17 +64,15 @@ namespace LibCast {
 
                     if (hitVertical) { if (dx < 0) offset = 1.0 - offset; }
                     else { if (dy > 0) offset = 1.0 - offset; }
-                    DrawRayTexture(wall.distance, offset, wall.texture, wall.isTall, col);
+                    DrawRayTexture(wall.distance, offset, wall.texture, room.textures[wall.texture].height, col);
                 }
-                if(walls.Count() == 0) {
-                    DrawFloorCeiling(maxRaySurfaces*2, col, da, viewAngle);
-                } else {
-                    DrawFloorCeiling(walls[walls.GetLength(0)-1].distance, col, da, viewAngle);
-                }
+
+                
             });
 
 
-            DrawEntities(viewAngle);
+
+            Screen.DrawText(pov.x + " " + pov.y, 10, 10);
         }
 
         private static bool inBounds(double x, double y) {
@@ -124,7 +119,7 @@ namespace LibCast {
                         string? innerTex = (side == 0) ? ((stepX > 0) ? prevCell.texture.eastIn : prevCell.texture.westIn)
                                                     : ((stepY > 0) ? prevCell.texture.southIn : prevCell.texture.northIn);
                         if (innerTex != null && distances.Count < maxRaySurfaces) {
-                            distances.Add(new WallInfo(correctedDist, wallHitX, wallHitY, innerTex, prevCell is TallCell));
+                            distances.Add(new WallInfo(correctedDist, wallHitX, wallHitY, innerTex));
                         }
                     }
                 }
@@ -137,14 +132,14 @@ namespace LibCast {
                     else solidTex = (stepY > 0) ? nextCell.texture.northOut : nextCell.texture.southOut;
 
                     if (solidTex != null && distances.Count < maxRaySurfaces) {
-                        distances.Add(new WallInfo(correctedDist, wallHitX, wallHitY, solidTex, nextCell is TallCell));
+                        distances.Add(new WallInfo(correctedDist, wallHitX, wallHitY, solidTex));
                     }
                     break;
                 } else {
                     string? outerTex = (side == 0) ? ((stepX > 0) ? nextCell.texture.westOut : nextCell.texture.eastOut)
                                                 : ((stepY > 0) ? nextCell.texture.northOut : nextCell.texture.southOut);
                     if (outerTex != null && distances.Count < maxRaySurfaces) {
-                        distances.Add(new WallInfo(correctedDist, wallHitX, wallHitY, outerTex, nextCell is TallCell));
+                        distances.Add(new WallInfo(correctedDist, wallHitX, wallHitY, outerTex));
                     }
                 }
                 hitCount++;
@@ -162,17 +157,18 @@ namespace LibCast {
             }
         }
 
-        private static void DrawRayTexture(double distance, double xPos, string? stringTexture, bool isTall, int column) {
+        private static void DrawRayTexture(double distance, double xPos, string? stringTexture, int wallHeight, int column) {
             if (stringTexture == null || !room.textures.TryGetValue(stringTexture, out var texture)) return;
 
-            double height = Math.Max(1, wallHeightScale / distance) * (isTall ? 2 : 1);
-            double top = (Screen.gameHeight / 2.0) - height * (isTall ? 0.75 : 0.5) + pitch;
+            double height = Math.Max(1, wallHeightScale / distance) * (wallHeight/256.0);
+            double baseHeight = wallHeightScale / distance;
+            double top = Screen.gameHeight / 2.0 + pitch - height + 0.5 * baseHeight;
 
             int yStart = Math.Max(0, (int)Math.Floor(top));
             int yEnd = Math.Min(Screen.gameHeight - 1, (int)Math.Ceiling(top + height) - 1);
 
-            int texW = texture.GetLength(1);
-            int texH = texture.GetLength(0);
+            int texW = room.textures[stringTexture].texture.GetLength(1);
+            int texH = room.textures[stringTexture].texture.GetLength(0);
             int texX = Math.Clamp((int)(xPos * (texW - 1)), 0, texW - 1);
 
             for (int y = yStart; y <= yEnd; y++) {
@@ -180,7 +176,7 @@ namespace LibCast {
                 if (v < 0 || v >= 1) continue;
 
                 int texY = Math.Clamp((int)(v * (texH - 1)), 0, texH - 1);
-                Color c = texture[texY, texX];
+                Color c = room.textures[stringTexture].texture[texY, texX];
                 if (c.A == 0) continue;
 
                 Screen.DrawPixelDepth(column, y, (int)(distance * 100), c); 
@@ -189,7 +185,7 @@ namespace LibCast {
 
 
 
-        private static void DrawFloorCeiling(double wallDistance, int column, double da, double viewAngle) {
+        private static void DrawFloorCeiling(int column, double da, double viewAngle) {
             double rayDirX = Math.Cos(da * PI_OVER_180);
             double rayDirY = -Math.Sin(da * PI_OVER_180);
             double cosAngleDiff = Math.Cos((da - viewAngle) * PI_OVER_180);
@@ -205,37 +201,51 @@ namespace LibCast {
             double povX = pov!.x;
             double povY = pov.y;
 
-            double wallHeight = Math.Max(1, wallHeightScale / (wallDistance));
-            double wallTop = horizon - wallHeight * 0.5;
-            double wallBottom = wallTop + wallHeight;
-
             for (int y = 0; y < Screen.gameHeight; y++) {
                 double pixelCenterY = y + 0.5;
-                if (pixelCenterY >= wallTop && pixelCenterY < wallBottom) continue;
-
                 double dy = pixelCenterY - horizon;
-                if (Math.Abs(dy) < 1e-6) continue;
+
+                if (Math.Abs(dy) < 1e-6)
+                    continue;
 
                 bool isFloor = dy > 0;
-                double planeDelta = isFloor ? cameraHeight : ceilingWorldHeight - cameraHeight;
-                double rowDistance = (planeDelta * wallHeightScale) / (Math.Abs(dy));
+
+                double planeDelta = isFloor
+                    ? cameraHeight
+                    : ceilingWorldHeight - cameraHeight;
+
+                double rowDistance = (planeDelta * wallHeightScale) / Math.Abs(dy);
                 if (rowDistance <= 0) continue;
-                if (!isFloor && rowDistance >= wallDistance) continue;
 
                 double rayDistance = rowDistance / cosAngleDiff;
+
                 double worldX = povX + rayDirX * rayDistance;
                 double worldY = povY + rayDirY * rayDistance;
 
-                int cellX = (int)worldX;
-                int cellY = (int)worldY;
+                int cellX = (int)Math.Floor(worldX);
+                int cellY = (int)Math.Floor(worldY);
+
                 if (!inBounds(cellX, cellY)) continue;
 
                 RoomCell cell = room.room[(cellX, cellY)];
-                string? texKey = isFloor ? cell.texture.bottom : cell.texture.top;
-                
-                DrawTexturedSurface(texKey, worldX, worldY, rowDistance, y, column, isFloor);
+                string? texKey = isFloor
+                    ? cell.texture.bottom
+                    : cell.texture.top;
+
+                if (texKey == null) continue;
+
+                DrawTexturedSurface(
+                    texKey,
+                    worldX,
+                    worldY,
+                    rowDistance,
+                    y,
+                    column,
+                    isFloor
+                );
             }
         }
+
 
         private static void DrawTexturedSurface(string? textureKey, double worldX, double worldY, double depthPerp, int y, int column, bool isFloor) {
             if (textureKey == null || !room.textures.TryGetValue(textureKey, out var texture)) return;
@@ -247,12 +257,12 @@ namespace LibCast {
                 fracX = 1.0-fracX;
             }
             
-            int texW = texture.GetLength(1);
-            int texH = texture.GetLength(0);
+            int texW = room.textures[textureKey].texture.GetLength(1);
+            int texH = room.textures[textureKey].texture.GetLength(0);
             int texX = Math.Clamp((int)(fracX * texW), 0, texW - 1);
             int texY = Math.Clamp((int)(fracY * texH), 0, texH - 1);
 
-            Color c = texture[texY, texX];
+            Color c = room.textures[textureKey].texture[texY, texX];
             if(c.A == 0) return;
             Screen.DrawPixelDepth(column, y, (int)(depthPerp * 100), c);
         }
@@ -264,7 +274,7 @@ namespace LibCast {
 
             List<(string texture, int x, int y, int depth, int width, double height)> entityDepthSorted = new List<(string texture, int x, int y, int depth, int width, double height)>();
 
-            foreach (Entity entity in room.entities) {
+            foreach (Entity entity in room.entitiesInRange) {
                 if (entity is Player || entity.texture == null) continue;
                 if (entity.texture == null || !room.textures.ContainsKey(entity.texture)) continue;
 
@@ -284,15 +294,13 @@ namespace LibCast {
                 int width = projectedHeight;
                 if (width <= 0) continue;
 
-                int top = (int)(halfScreenHeight - (projectedHeight * 0.5) + pitch);
                 int depth = (int)(correctedDistance * 100);
                 if(depth > 3000) continue;
                 int screenX = (int)Math.Round(entityColumn) - width / 2;
 
-                if(entity.isTall) {
-                    projectedHeight*=2;
-                    top = top - (int)projectedHeight/2;
-                }
+                double heightRatio = room.textures[entity.texture].height / 256.0;
+                projectedHeight = (int)(projectedHeight * heightRatio);
+                int top = (int)(Screen.gameHeight / 2.0 + pitch - projectedHeight + 0.5 * (projectedHeight / heightRatio));
                 entityDepthSorted.Add((entity.texture, screenX, top, depth, width, projectedHeight));
 
             }

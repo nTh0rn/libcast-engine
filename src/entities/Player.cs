@@ -8,11 +8,10 @@ namespace LibCast {
         public override double direction { get; set; } = 0;
         public override double radius { get; set; } = 0.10;
         public override double pitch {get; set;} = 0;
-        public override int pitchRange {get; set;} = 42;
+        public override int pitchRange {get; set;} = 144;
         public double mouseSensitivity {get; set;} = 1;
         public double gravityAcceleration {get; set;} = -.2;
         public double gravityVelocity {get; set;} = 0;
-        private double traversalScale {get; set;}  = 10;
 
         public Player(int x, int y) {
             this.x = x;
@@ -86,50 +85,9 @@ namespace LibCast {
             pitch -= mouseDelta[1]*Screen.deltaTime;
             if(pitch > pitchRange) pitch = pitchRange;
             if(pitch < -pitchRange) pitch = -pitchRange;
-
         }
         
-        private void moveDirection(double dir) {
-            double dx = Math.Cos((dir) * (Math.PI / 180.0)) / traversalScale * Screen.deltaTime;
-            double dy = -Math.Sin((dir) * (Math.PI / 180.0)) / traversalScale * Screen.deltaTime;
-
-            int dirx = dx > 0 ? 1 : -1;
-            int diry = dy > 0 ? 1 : -1;
-            double oldX = x, oldY = y;
-
-            if(KeyDown(KeyboardKey.LeftShift)) {
-                dx *= 1.5;
-                dy *= 1.5;
-            }
-            
-            // Try full movement
-            x += dx; y += dy;
-            if(IsValidMove(dirx, diry)) return;
-            
-            // Try X-only slide
-            x = oldX + dx; y = oldY;
-            if(IsValidMove(dirx, diry)) return;
-            
-            // Try Y-only slide
-            x = oldX; y = oldY + dy;
-            if(IsValidMove(dirx, diry)) return;
-            
-            // Revert to original
-            x = oldX; y = oldY;
-        }
         
-        private bool IsValidMove(int dirx, int diry) {
-            int ix = (int)(x+radius*dirx), iy = (int)(y+radius*diry);
-            if(!Game.room.room.ContainsKey((ix, iy))) return false;
-            //if(iy < 0 || iy >= Game.room.room.Count || ix < 0 || ix >= Game.room.room[iy].Count) return false;
-            if(Game.room.room[(ix, iy)] is SolidCell) return false;
-            
-            foreach(Entity entity in Game.room.entities) {
-                if(entity != this && entity.CollisionEntity(this)) return false;
-            }
-            return true;
-        }
-
         public new void DrawPitch(int drawX, int drawY) {
             int radius = 10;
             Screen.Fill(Color.Green);

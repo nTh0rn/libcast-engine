@@ -1,15 +1,13 @@
 namespace LibCast {
     public class RoomForest : Room {
         public override string name => "rmForest";
-        public override List<List<char>> roomAsArray => GenerateForest(100,100, 500);
+        public override List<List<char>> roomAsArray => GenerateForest(100,100, 1000);
         public override string? skyboxTexture => "src/assets/textures/sky.png";
 
         public RoomForest() : base(){
             //room[2][2] = new EmptyCell(2, 2, ' ');
-            entities.Add(new Player(2, 2));
-            for(int i = 0; i < 1; i++) {
-                entities.Add(new JennEntity(2, 3));
-            }
+            AddEntity(new Player(2,2));
+            AddEntity(new JennEntity(2, 3));
 
             
 
@@ -19,22 +17,17 @@ namespace LibCast {
             //     }
             // }
 
-            foreach (Entity entity in entities) {
-                if (entity is Player) {
-                    player = (Player)entity;
-                }
-            }
-
             LoadTextures();
 
 
         }
 
         public override void Loop() {
+            UpdateEntitiesInRange();
             if(UI.gameState != GameState.PLAY) {
                 return;
             }
-            foreach (Entity entity in entities) {
+            foreach(Entity entity in entitiesInRange) {
                 entity.Loop();
             }
             //DrawTopDown(0,0);
@@ -55,9 +48,6 @@ namespace LibCast {
                 }
             }
 
-            for(int i = 0; i < treeCount; i++) {
-                entities.Add(new TreeEntity(r.Next(width), r.Next(height)));
-            }
 
             return cells;
         }

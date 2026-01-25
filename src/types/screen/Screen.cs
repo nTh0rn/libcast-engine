@@ -145,7 +145,7 @@ namespace LibCast {
 
 
         public static void Draw() {
-            
+            //return;
             for (int y = screen.Count - 1; y >= 0; y--) {
                 for (int x = screen[y].Count - 1; x >= 0; x--) {
                     Raylib.DrawRectangle(x * pixelScale, y * pixelScale, pixelScale, pixelScale, screen[y][x].fillColor);
@@ -195,7 +195,20 @@ namespace LibCast {
 
 
 
+        // public static void DrawPixel(int x, int y, char character, Color color, int depth) {
+        //     byte a = color.A;
+        //     if (a != 255) {
+        //         int r = (color.R * a + screen[y][x].fillColor.R * (255 - a)) / 255;
+        //         int g = (color.G * a + screen[y][x].fillColor.G * (255 - a)) / 255;
+        //         int b = (color.B * a + screen[y][x].fillColor.B * (255 - a)) / 255;
+        //         screen[y][x] = new Pixel(new Color(r, g, b, 255), strokeColor, depth, ' ', currentMouseCollision);
+        //     } else {
+        //         screen[y][x] = new Pixel(color, strokeColor, depth, character, currentMouseCollision);
+        //     }
+        // }
+
         public static void DrawPixel(int x, int y, char character, Color color, int depth) {
+            //screen[y][x] = new Pixel(color, strokeColor, depth, character, currentMouseCollision);
             byte a = color.A;
             if (a != 255) {
                 int r = (color.R * a + screen[y][x].fillColor.R * (255 - a)) / 255;
@@ -205,6 +218,8 @@ namespace LibCast {
             } else {
                 screen[y][x] = new Pixel(color, strokeColor, depth, character, currentMouseCollision);
             }
+            //Raylib.DrawRectangle(x * pixelScale, y * pixelScale, pixelScale, pixelScale, color);
+            
         }
         
         public static void DrawPixel(int x, int y, char character=' ', int depth=int.MaxValue) {
@@ -360,7 +375,7 @@ namespace LibCast {
             int width = 0,
             int height = 0
         ) {
-            Color[,] tex = Game.room.textures[texture];
+            Color[,] tex = Game.room.textures[texture].texture;
             int texH = tex.GetLength(0);
             int texW = tex.GetLength(1);
 

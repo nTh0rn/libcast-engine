@@ -20,22 +20,14 @@ namespace LibCast {
 
         public RoomDefault() : base() {
             //room[2][2] = new EmptyCell(2, 2, ' ');
-            entities.Add(new Player(2, 2));
-            for(int i = 0; i < 1; i++) {
-                entities.Add(new JennEntity(2, 3));
-            }
+            AddEntity(new Player(2,2));
+            AddEntity(new JennEntity(2, 3));
 
             // for(int i = 0; i < getHeight(); i++) {
             //     for(int j = 0; j < getWidth(i); j++) {
             //         entities.Add(new TestEntity(j, i));
             //     }
             // }
-
-            foreach (Entity entity in entities) {
-                if (entity is Player) {
-                    player = (Player)entity;
-                }
-            }
 
             LoadTextures();
 
@@ -45,7 +37,7 @@ namespace LibCast {
             if(UI.gameState != GameState.PLAY) {
                 return;
             }
-            foreach (Entity entity in entities) {
+            foreach (Entity entity in entitiesInRange) {
                 entity.Loop();
             }
             //DrawTopDown(0,0);
