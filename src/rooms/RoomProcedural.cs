@@ -60,16 +60,22 @@ namespace LibCast {
         private void GenerateChunk(int chunkX, int chunkY) {
             for (int innerX = chunkX * chunkSize; innerX < chunkX * chunkSize + chunkSize; innerX++) {
                 for (int innerY = chunkY * chunkSize; innerY < chunkY * chunkSize + chunkSize; innerY++) {
+                    if(innerX == (int)player.x && innerY == (int)player.y) {
+                        continue;
+                    }
                     if(room.ContainsKey((innerX, innerY))) {
                         throw new Exception("Overgenerating terrain!");
                     }
                     if(rng.Next(100) < 95) {
-                        room.Add((innerX, innerY), new EmptyCell(innerX, innerY, ' '));
+                        room.Add((innerX, innerY), new EmptyCell(innerX, innerY));
                     } else {
-                        room.Add((innerX, innerY), new DoorCell(innerX, innerY, 'a'));
+                        room.Add((innerX, innerY), new DoorCell(innerX, innerY));
                     }
-                    if(rng.Next(100) < 30) {
+                    int entityType = rng.Next(100);
+                    if(entityType < 5) {
                         AddEntity(new TreeEntity(innerX, innerY));
+                    } else if(entityType < 10) {
+                        AddEntity(new RockEntity(innerX, innerY));
                     }
                 }
             }

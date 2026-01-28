@@ -11,9 +11,9 @@ namespace LibCast {
 
     public class PlayUI {
         public static void ApplySizing() {
-            SetPixelScale(10);
+            SetPixelScale(8);
             ApplyBuffer(2560, 1440);
-            SetGameSize(256, 144);
+            SetGameSize(320, 180);
         }
 
         public static void Loop() {

@@ -54,6 +54,12 @@ namespace LibCast {
                 moveDirection(direction - 180);
             }
 
+            if (KeyPressed(KeyboardKey.B)) {
+                HouseStructure house = new HouseStructure(x+2, y+2);
+                Console.WriteLine(x + " " + y);
+                house.Build();
+            }
+
             if(KeyPressed(KeyboardKey.Space)) {
                 gravityVelocity = 5;
             }
@@ -104,7 +110,7 @@ namespace LibCast {
 
             Screen.Fill(Color.Red);
             
-            double angle = -pitch * (Math.PI / 180.0);
+            double angle = -60.0*(pitch/pitchRange) * (Math.PI / 180.0);
             
             int endX = drawX - (int)((radius-1) * Math.Cos(angle));
             int endY = drawY + (int)((radius-1) * Math.Sin(angle));

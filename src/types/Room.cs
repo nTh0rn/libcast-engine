@@ -58,35 +58,44 @@ namespace LibCast {
     }
 
     public abstract class RoomCell {
-        public char character;
         public double x;
         public double y;
         public TextureMap texture;
         public bool stopRay = false;
 
-        public RoomCell(double x, double y, char character) {
+        public RoomCell(double x, double y) {
             this.x = x;
             this.y = y;
-            this.character = character;
             texture = new TextureMap();
         }
+
+        public object Clone() {
+            return this.MemberwiseClone();
+        }
+
+        public void SetPosition(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+
+
     }
 
     public class WallCell : SolidCell {
-        public WallCell(double x, double y, char character) : base(x, y, character) {
+        public WallCell(double x, double y) : base(x, y) {
         }
     }
 
     public class PlayerCell : RoomCell {
-        public PlayerCell(double x, double y, char character) : base(x, y, character) {}
+        public PlayerCell(double x, double y) : base(x, y) {}
     }
 
     public class SolidCell : RoomCell {
-        public SolidCell(double x, double y, char character) : base(x, y, character) {}
+        public SolidCell(double x, double y) : base(x, y) {}
     }
 
     public class EmptyCell : RoomCell {
-        public EmptyCell(double x, double y, char character) : base(x, y, character) {
+        public EmptyCell(double x, double y) : base(x, y) {
             //floorTexture = "src/assets/textures/dark_cobblestone.png";
             //ceilingTexture = "src/assets/textures/dark_brick_wall.png";
             texture.bottom = "src/assets/textures/grass.png";
@@ -94,7 +103,7 @@ namespace LibCast {
     }
 
     public class SpecialFloorCell : EmptyCell {
-        public SpecialFloorCell(double x, double y, char character) : base(x, y, character) {
+        public SpecialFloorCell(double x, double y) : base(x, y) {
             texture = new TextureMap("src/assets/textures/wall_old.png", "src/assets/textures/wall_brick.png");
         }
     }
@@ -133,17 +142,17 @@ namespace LibCast {
         public RoomCell ParseRoomChar(char character, int x, int y) {
             switch (character) {
                 case '#':
-                    return new DarkBrickWall(x, y, character);
+                    return new DarkBrickWall(x, y);
                 case '!':
-                    return new TallCell(x, y, character);
+                    return new TallCell(x, y);
                 case 'a':
-                    return new DoorCell(x, y, character);
+                    return new DoorCell(x, y);
                 case ' ':
-                    return new EmptyCell(x, y, character);
+                    return new EmptyCell(x, y);
                 case '*':
-                    return new SpecialFloorCell(x, y, character);
+                    return new SpecialFloorCell(x, y);
                 case '@':
-                    return new PlayerCell(x, y, character);
+                    return new PlayerCell(x, y);
                 default:
                     throw new Exception("Unaccounted for room cell character.");
             }
@@ -231,8 +240,8 @@ namespace LibCast {
 
         public void DrawTopDown(int x, int y) {
             foreach (var cell in room) {
-                Color cellColor = new Color(cell.Value.character*10 % 255, cell.Value.character*100 % 255, cell.Value.character*1000 % 255);
-                Screen.Fill(cellColor);
+                //Color cellColor = new Color(cell.Value*10 % 255, cell.Value.character*100 % 255, cell.Value.character*1000 % 255);
+                //Screen.Fill(cellColor);
                 Screen.DrawRect(x+cell.Key.Item1*3, y+cell.Key.Item2*3, 3, 3);
             }
 
@@ -277,12 +286,8 @@ namespace LibCast {
 
 
         public (int x, int y) CoordinateToChunk(double x, double y) {
-            int cx = (int)x / chunkSize;
-            int cy = (int)y / chunkSize;
-
-            if (x < 0 && x % chunkSize != 0) cx--;
-            if (y < 0 && y % chunkSize != 0) cy--;
-
+            int cx = (int)Math.Floor(x / chunkSize);
+            int cy = (int)Math.Floor(y / chunkSize);
             return (cx, cy);
         }
 

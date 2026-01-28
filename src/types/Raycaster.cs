@@ -45,6 +45,12 @@ namespace LibCast {
             double viewY = pov.y;
             
             DrawSkyBox();
+            Parallel.For(0, Screen.gameWidth, col => {
+                double da = -Math.Atan((col - Screen.gameWidth / 2.0) / (Screen.gameWidth / 2.0) * fovScale) * RAD2DEG + viewAngle;
+                while (da < 0) da += 360;
+                while (da >= 360) da -= 360;
+                DrawFloorCeiling(col, da, viewAngle);
+            });
             DrawEntities(viewAngle);
             Parallel.For(0, Screen.gameWidth, col => {
                 double da = -Math.Atan((col - Screen.gameWidth / 2.0) / (Screen.gameWidth / 2.0) * fovScale) * RAD2DEG + viewAngle;
@@ -53,7 +59,7 @@ namespace LibCast {
 
                 double dx = Math.Cos(da * DEG2RAD);
                 double dy = -Math.Sin(da * DEG2RAD);
-                DrawFloorCeiling(col, da, viewAngle);
+                //DrawFloorCeiling(col, da, viewAngle);
                 WallInfo[] walls = CastRay(dx, dy, (int)Math.Floor(viewX), (int)Math.Floor(viewY), viewX, viewY, da, viewAngle);
                 foreach (WallInfo wall in walls.Reverse()) {
                     double xOffset = wall.rx - Math.Floor(wall.rx);

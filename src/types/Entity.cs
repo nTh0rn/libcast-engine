@@ -32,19 +32,22 @@ namespace LibCast {
         public void moveDirection(double dir) {
             double dx = Math.Cos((dir) * (Math.PI / 180.0)) * traversalScale * Screen.deltaTime;
             double dy = -Math.Sin((dir) * (Math.PI / 180.0)) * traversalScale * Screen.deltaTime;
-            int dirx = dx > 0 ? 1 : -1;
-            int diry = dy > 0 ? 1 : -1;
             double oldX = x, oldY = y;
 
             if(KeyDown(KeyboardKey.LeftShift)) {
                 dx *= 1.5;
                 dy *= 1.5;
             }
-            
-            double[,] attempts = new double[,]{{dx, dy}, {oldX + dx, oldY}, {oldX, oldY + dy}};
+
+            // Try diagonal, then horizontal, then vertical
+            double[,] attempts = new double[,]{{dx, dy}, {dx, 0}, {0, dy}};
             for(int i = 0; i < attempts.GetLength(0); i++) {
-                x += attempts[i,0];
-                y += attempts[i,1];
+                double tryX = oldX + attempts[i,0];
+                double tryY = oldY + attempts[i,1];
+                int dirx = attempts[i,0] > 0 ? 1 : -1;
+                int diry = attempts[i,1] > 0 ? 1 : -1;
+                x = tryX;
+                y = tryY;
                 if(IsValidMove(dirx, diry)) {
                     (int chunkX, int chunkY) newChunk = Game.room.CoordinateToChunk(x, y);
                     (int chunkX, int chunkY) oldChunk = Game.room.CoordinateToChunk(oldX, oldY);

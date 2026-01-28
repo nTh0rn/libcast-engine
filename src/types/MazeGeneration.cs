@@ -25,7 +25,7 @@ namespace LibCast {
             for (int i = 0; i < height; i++) {
                 cells.Add(new List<RoomCell>());
                 for (int j = 0; j < width; j++) {
-                    cells[i].Add(new WallCell(j, i, 'a'));
+                    cells[i].Add(new WallCell(j, i));
                 }
             }
             MazeCell firstCell = new MazeCell(1, 1);
@@ -42,12 +42,12 @@ namespace LibCast {
             }
 
             List<List<char>> output = new List<List<char>>() { };
-            for (int i = 0; i < cells.Count(); i++) {
-                output.Add(new List<char>(){});
-                for (int j = 0; j < cells[i].Count(); j++) {
-                    output[i].Add(cells[i][j].character);
-                }
-            }
+            // for (int i = 0; i < cells.Count(); i++) {
+            //     output.Add(new List<char>(){});
+            //     for (int j = 0; j < cells[i].Count(); j++) {
+            //         output[i].Add(cells[i][j].character);
+            //     }
+            // }
             return output;
         }
 
@@ -60,8 +60,8 @@ namespace LibCast {
                 try {
                     string t = "";
                     for (int j = -1; j <= 1; j++) {
-                        t += (direction % 2 == 0 ? cells[cell.y + j][cell.x + i] : cells[cell.y + i][cell.x + j]).character.ToString();
-                        t += (direction % 2 == 0 ? cells[cell.y + j][cell.x + i*2] : cells[cell.y + i*2][cell.x + j]).character.ToString();
+                        //t += (direction % 2 == 0 ? cells[cell.y + j][cell.x + i] : cells[cell.y + i][cell.x + j]).character.ToString();
+                        //t += (direction % 2 == 0 ? cells[cell.y + j][cell.x + i*2] : cells[cell.y + i*2][cell.x + j]).character.ToString();
                     }
                     if (t == "######") {
                         cell.dirs.Add(direction);
@@ -71,7 +71,7 @@ namespace LibCast {
                     i *= -1;
                 }
             }
-            cells[cell.y][cell.x].character = ' ';
+            //cells[cell.y][cell.x].character = ' ';
             return cell;
         }
     }

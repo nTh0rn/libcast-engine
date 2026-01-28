@@ -41,13 +41,21 @@ namespace LibCast {
     
     public class Screen {
 
+        // Bayer 4x4 dithering matrix for transparency
+        private static readonly int[,] bayerMatrix4x4 = new int[4, 4] {
+            { 0,  8,  2, 10 },
+            { 12, 4, 14,  6 },
+            { 3, 11,  1,  9 },
+            { 15, 7, 13,  5 }
+        };
+
         //Game scaling 
         public static int windowWidth = 1280;
         public static int windowHeight = 720;
         public static int bufferWidth = 2560;
         public static int bufferHeight = 1440;
-        public static int gameWidth = 256;
-        public static int gameHeight = 144;
+        public static int gameWidth = 320;
+        public static int gameHeight = 180;
         public static int pixelScale = 10;
         public static RenderTexture2D target;
         public static double scale;
@@ -195,20 +203,7 @@ namespace LibCast {
 
 
 
-        // public static void DrawPixel(int x, int y, char character, Color color, int depth) {
-        //     byte a = color.A;
-        //     if (a != 255) {
-        //         int r = (color.R * a + screen[y][x].fillColor.R * (255 - a)) / 255;
-        //         int g = (color.G * a + screen[y][x].fillColor.G * (255 - a)) / 255;
-        //         int b = (color.B * a + screen[y][x].fillColor.B * (255 - a)) / 255;
-        //         screen[y][x] = new Pixel(new Color(r, g, b, 255), strokeColor, depth, ' ', currentMouseCollision);
-        //     } else {
-        //         screen[y][x] = new Pixel(color, strokeColor, depth, character, currentMouseCollision);
-        //     }
-        // }
-
         public static void DrawPixel(int x, int y, char character, Color color, int depth) {
-            //screen[y][x] = new Pixel(color, strokeColor, depth, character, currentMouseCollision);
             byte a = color.A;
             if (a != 255) {
                 int r = (color.R * a + screen[y][x].fillColor.R * (255 - a)) / 255;
@@ -218,9 +213,26 @@ namespace LibCast {
             } else {
                 screen[y][x] = new Pixel(color, strokeColor, depth, character, currentMouseCollision);
             }
-            //Raylib.DrawRectangle(x * pixelScale, y * pixelScale, pixelScale, pixelScale, color);
-            
         }
+
+        // public static void DrawPixel(int x, int y, char character, Color color, int depth) {
+        //     byte a = color.A;
+        //     if (a < 255) {
+        //         // Apply Bayer dithering for transparency
+        //         int ditherX = x % 4;
+        //         int ditherY = y % 4;
+        //         int ditherThreshold = (bayerMatrix4x4[ditherY, ditherX] + 1) * 16; // 16-255 range (16 levels)
+                
+        //         if (a < ditherThreshold) {
+        //             // Don't draw - keep background
+        //             return;
+        //         }
+        //     }
+            
+        //     // Draw at 100% opacity
+        //     Color opaqueColor = new Color(color.R, color.G, color.B, (byte)255);
+        //     screen[y][x] = new Pixel(color, strokeColor, depth, character, currentMouseCollision);
+        // }
         
         public static void DrawPixel(int x, int y, char character=' ', int depth=int.MaxValue) {
             DrawPixel(x, y, character, fillColor, depth);
