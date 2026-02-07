@@ -13,7 +13,7 @@ namespace LibCast {
         }
 
         public override bool Loop() {
-            if(Game.room.room[(FloorWorldCoord(x), FloorWorldCoord(y))] is SolidCell) {
+            if(Game.room.room[FloorWorldCoords(x, y)] is SolidCell) {
                 Game.room.entities[Game.room.CoordinateToChunk(x, y)].Remove(this);
             }
             return true;

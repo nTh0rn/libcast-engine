@@ -1,7 +1,7 @@
 namespace LibCast {
     public class Game {
         public static Room room; // Current room
-        public static List<Room> rooms = new List<Room>() {new RoomProcedural(), new RoomDefault(), new RoomForest()}; // All available rooms.
+        public static List<Room> rooms = new List<Room>() {new RoomProcedural(), new RoomDefault()}; // All available rooms.
 
         // Load a particular room
         public static void LoadRoom(string roomName) {
