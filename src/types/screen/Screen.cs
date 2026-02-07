@@ -13,6 +13,14 @@ namespace LibCast {
             this.fillColor = fillColor;
         }
 
+        public Pixel(Pixel copy, int newDepth){
+            fillColor = copy.fillColor;
+            strokeColor = copy.strokeColor;
+            depth = newDepth;
+            character = copy.character;
+            collisionFamily = copy.collisionFamily;
+        }
+
         public Pixel(Color fillColor, Color strokeColor, MouseCollision? collisionFamily = null) {
             this.fillColor = fillColor;
             this.strokeColor = strokeColor;
@@ -157,6 +165,7 @@ namespace LibCast {
             for (int y = screen.Count - 1; y >= 0; y--) {
                 for (int x = screen[y].Count - 1; x >= 0; x--) {
                     Raylib.DrawRectangle(x * pixelScale, y * pixelScale, pixelScale, pixelScale, screen[y][x].fillColor);
+                    //Raylib.DrawPixel(x, y, screen[y][x].fillColor);
                     if (screen[y][x].character != ' ') {
                         for (int i = 0; i < 5; i++) {
                             Raylib.DrawTextEx(smallTextFont, screen[y][x].character.ToString(), new Vector2(x * pixelScale, y * pixelScale + 3), Screen.pixelScale * 2, 0, screen[y][x].strokeColor);
@@ -385,53 +394,81 @@ namespace LibCast {
             int y,
             int? depth = int.MaxValue,
             int width = 0,
-            int height = 0
+            int height = 0,
+            int viewX = 0,
+            int viewY = 0,
+            int viewW = -1,
+            int viewH = -1
         ) {
+            if(viewW == -1) viewW = Screen.gameWidth;
+            if(viewH == -1) viewH = Screen.gameHeight;
             Color[,] tex = Game.room.textures[texture].texture;
             int texH = tex.GetLength(0);
             int texW = tex.GetLength(1);
 
-            if (width <= 0 && height <= 0) {
-                width = texW;
-                height = texH;
-            }
-            else if (width <= 0) {
-                width = (int)Math.Round((double)height * texW / texH);
-            }
-            else if (height <= 0) {
-                height = (int)(width * (double)texH / texW);
-            }
-
-            if (width <= 0 || height <= 0) return;
-
             double invW = 1.0 / width;
             double invH = 1.0 / height;
 
-            int yStart = Math.Max(0, y);
-            int yEnd   = Math.Min(Screen.gameHeight - 1,
-                                y + height - 1);
 
-            for (int sx = Math.Max(0, x);
-                sx < x + width && sx < Screen.gameWidth;
-                sx++) {
+            /* Viewport bounds */
+            int viewLeft   = viewX;
+            int viewTop    = viewY;
+            int viewRight  = viewX + viewW;
+            int viewBottom = viewY + viewH;
 
-                double u = (sx - x + 0.5) * invW;
-                int texX = (int)(u * (texW - 1));
 
-                for (int sy = yStart; sy <= yEnd; sy++) {
-                    double centerY = sy + 0.5;
-                    if (centerY < y || centerY >= y + height) continue;
+            /* Destination bounds */
+            int dstLeft   = x;
+            int dstTop    = y;
+            int dstRight  = x + width;
+            int dstBottom = y + height;
 
-                    double v = (centerY - y) * invH;
-                    int texY = (int)(v * (texH - 1));
+
+            /* Early reject */
+            if (dstRight  <= viewLeft ||
+                dstLeft   >= viewRight ||
+                dstBottom <= viewTop ||
+                dstTop    >= viewBottom)
+                return;
+
+
+            /* Clipped draw area */
+            int clipLeft   = Math.Max(dstLeft, viewLeft);
+            int clipTop    = Math.Max(dstTop, viewTop);
+            int clipRight  = Math.Min(dstRight, viewRight);
+            int clipBottom = Math.Min(dstBottom, viewBottom);
+
+
+            for (int sy = clipTop; sy < clipBottom; sy++) {
+
+                double v = (sy + 0.5 - dstTop) * invH;
+                if (v < 0 || v >= 1) continue;
+
+                int texY = Math.Clamp((int)(v * texH), 0, texH - 1);
+
+                for (int sx = clipLeft; sx < clipRight; sx++) {
+
+                    double u = (sx + 0.5 - dstLeft) * invW;
+                    if (u < 0 || u >= 1) continue;
+
+                    int texX = Math.Clamp((int)(u * texW), 0, texW - 1);
 
                     Color c = tex[texY, texX];
                     if (c.A == 0) continue;
-                    if(depth != null) {
+
+                    if (depth != null) {
                         Screen.DrawPixelDepth(sx, sy, (int)depth, c);
                     } else {
                         Screen.DrawPixel(sx, sy, c);
                     }
+                }
+            }
+        }
+
+        public static void BakeScreenDepth() {
+            for(int y = 0; y < gameHeight; y++) {
+                for(int x = 0; x < gameWidth; x++) {
+                    screen[y][x] = new Pixel(screen[y][x], int.MaxValue);
                 }
             }
         }

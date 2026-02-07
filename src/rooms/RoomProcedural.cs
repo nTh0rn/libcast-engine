@@ -8,6 +8,7 @@ namespace LibCast {
             //room[2][2] = new EmptyCell(2, 2, ' ');
             AddEntity(new Player(2,2));
             AddEntity(new JennEntity(2, 3));
+            AddEntity(new Camera(10, 10));
 
             // for(int i = 0; i < getHeight(); i++) {
             //     for(int j = 0; j < getWidth(i); j++) {
@@ -24,7 +25,9 @@ namespace LibCast {
             if(UI.gameState != GameState.PLAY) {
                 return;
             }
+            player.Loop();
             foreach(Entity entity in entitiesInRange) {
+                if(entity is Player) continue;
                 entity.Loop();
             }
             //DrawTopDown(0,0);
@@ -34,7 +37,7 @@ namespace LibCast {
 
             if (player == null) return;
 
-            (int x, int y) center = ((int)player.x, (int)player.y);
+            (int x, int y) center = (FloorWorldCoord(player.x), FloorWorldCoord(player.y));
             // (int x, int y) centerChunk = (
             //     (center.x - ((center.x % chunkSize + chunkSize) % chunkSize)) / chunkSize,
             //     (center.y - ((center.y % chunkSize + chunkSize) % chunkSize)) / chunkSize
@@ -60,7 +63,7 @@ namespace LibCast {
         private void GenerateChunk(int chunkX, int chunkY) {
             for (int innerX = chunkX * chunkSize; innerX < chunkX * chunkSize + chunkSize; innerX++) {
                 for (int innerY = chunkY * chunkSize; innerY < chunkY * chunkSize + chunkSize; innerY++) {
-                    if(innerX == (int)player.x && innerY == (int)player.y) {
+                    if(innerX == FloorWorldCoord(player.x) && innerY == FloorWorldCoord(player.y)) {
                         continue;
                     }
                     if(room.ContainsKey((innerX, innerY))) {

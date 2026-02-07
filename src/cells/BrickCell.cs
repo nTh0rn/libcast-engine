@@ -7,7 +7,7 @@ namespace LibCast {
 
     public class DarkBrickWall : WallCell {
         public DarkBrickWall(double x, double y) : base(x, y) {
-            texture.SetOutTextures("src/assets/textures/tree_tall.png");
+            texture.SetOutTextures("src/assets/textures/dark_cobblestone.png");
             //floorTexture = "src/assets/textures/sky.png";
             //ceilingTexture = "src/assets/textures/dark_cobblestone.png";
         }

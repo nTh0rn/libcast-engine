@@ -74,8 +74,8 @@ namespace LibCast {
         }
 
         public void SetPosition(int x, int y) {
-            this.x = x;
-            this.y = y;
+            this.x = (double)x;
+            this.y = (double)y;
         }
 
 
@@ -247,9 +247,7 @@ namespace LibCast {
 
             if(player != null) {
                 Screen.Fill(Color.Blue);
-                //Screen.DrawPixel(x+(((int)player.x)*3)+1, y+(((int)player.y)*3)+1)
                 Screen.DrawRect(x+(((int)player.x)*3)+1, y+(((int)player.y)*3)+1, 1, 1);
-                //Screen.DrawPixel(x+(((int)player.x)*3)-1, y+(((int)player.y)*3)-1);
                 Screen.DrawText(GetArrow(player.direction % 360), x+(((int)player.x)*3)+1, y+(((int)player.y)*3)+1);
             }
         }
@@ -286,9 +284,7 @@ namespace LibCast {
 
 
         public (int x, int y) CoordinateToChunk(double x, double y) {
-            int cx = (int)Math.Floor(x / chunkSize);
-            int cy = (int)Math.Floor(y / chunkSize);
-            return (cx, cy);
+            return FloorWorldCoords(x / chunkSize, y / chunkSize);
         }
 
         public void AddEntity(Entity entity) {

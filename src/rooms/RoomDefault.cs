@@ -34,6 +34,7 @@ namespace LibCast {
         }
 
         public override void Loop() {
+            UpdateEntitiesInRange();
             if(UI.gameState != GameState.PLAY) {
                 return;
             }

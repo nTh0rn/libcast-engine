@@ -12,8 +12,8 @@ namespace LibCast {
         }
 
         public HouseStructure(double x, double y) {
-            this.x = (int)x;
-            this.y = (int)y;
+            this.x = FloorWorldCoord(x);
+            this.y = FloorWorldCoord(y);
             Console.WriteLine("Building at " + x + " " + y);
         }
 

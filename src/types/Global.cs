@@ -18,6 +18,18 @@ namespace LibCast {
             return DistanceBetween(entity1.x, entity1.y, entity2.x, entity2.y);
         }
 
+        public static int FloorWorldCoord(double val) {
+            return (int)Math.Floor(val);
+        }
+
+        public static (int, int) FloorWorldCoords((double x, double y) coord) {
+            return (FloorWorldCoord(coord.x), FloorWorldCoord(coord.y));
+        }
+
+        public static (int, int) FloorWorldCoords(double x, double y) {
+            return FloorWorldCoords((x, y));
+        }
+
         public static Random random = new Random();
 
     }
