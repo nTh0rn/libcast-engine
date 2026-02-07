@@ -20,16 +20,12 @@ namespace LibCast {
         }
 
         public override void Loop() {
-            GenerateTerrain();
-            UpdateEntitiesInRange();
             if(UI.gameState != GameState.PLAY) {
                 return;
             }
-            player.Loop();
-            foreach(Entity entity in entitiesInRange) {
-                if(entity is Player) continue;
-                entity.Loop();
-            }
+            GenerateTerrain();
+            LoopEntities();
+            
             //DrawTopDown(0,0);
         }
 
@@ -38,17 +34,6 @@ namespace LibCast {
             if (player == null) return;
 
             (int x, int y) center = (FloorWorldCoord(player.x), FloorWorldCoord(player.y));
-            // (int x, int y) centerChunk = (
-            //     (center.x - ((center.x % chunkSize + chunkSize) % chunkSize)) / chunkSize,
-            //     (center.y - ((center.y % chunkSize + chunkSize) % chunkSize)) / chunkSize
-            // );
-
-            // for (int cx = centerChunk.x - renderDistance; cx <= centerChunk.x + renderDistance; cx++) {
-            //     for (int cy = centerChunk.y - renderDistance; cy <= centerChunk.y + renderDistance; cy++) {
-            //         GenerateChunk(cx * chunkSize, cy * chunkSize);
-            //     }
-            // }
-
             (int x, int y) centerChunk = CoordinateToChunk(center.x, center.y);
 
             for(int chunkX = centerChunk.x - renderDistance; chunkX <= centerChunk.x + renderDistance; chunkX++) {
@@ -75,7 +60,9 @@ namespace LibCast {
                         room.Add((innerX, innerY), new DoorCell(innerX, innerY));
                     }
                     int entityType = rng.Next(100);
-                    if(entityType < 5) {
+                    if(entityType < 1) {
+                        AddEntity(new TallTest(innerX, innerY));
+                    } else if(entityType < 5) {
                         AddEntity(new TreeEntity(innerX, innerY));
                     } else if(entityType < 10) {
                         AddEntity(new RockEntity(innerX, innerY));

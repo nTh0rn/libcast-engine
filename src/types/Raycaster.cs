@@ -25,7 +25,7 @@ namespace LibCast {
         private const double DEG2RAD = Math.PI / 180.0;
         private const double RAD2DEG = 180.0 / Math.PI;
         private const double PI_OVER_180 = Math.PI / 180.0;
-        private const int maxRaySurfaces = 15;
+        public static int maxRaySurfaces = 32;
 
         private static Raycastable pov = null!;
         private static Room room = null!;
@@ -174,7 +174,7 @@ namespace LibCast {
         private static void DrawRayTexture(double distance, double xPos, string? stringTexture, int wallHeight, int column) {
             if (stringTexture == null || !room.textures.TryGetValue(stringTexture, out var texture)) return;
 
-            double h = Math.Max(1, wallHeightScale / distance) * (wallHeight/256.0);
+            double h = Math.Max(1, wallHeightScale / distance) * (wallHeight/room.textures[stringTexture].texture.GetLength(1));
             double baseHeight = wallHeightScale / distance;
             double top = viewHeight / 2.0 + pitch - h + 0.5 * baseHeight;
 

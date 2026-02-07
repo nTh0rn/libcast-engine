@@ -8,14 +8,14 @@ namespace LibCast {
         public abstract int pitchRange {get; set;}
 
         public void DrawPitch(int drawX, int drawY) {
-            int radius = 10;
+            int r = 10;
             Screen.Fill(Color.Green);
-            for(int i = 0; i < radius*2-2; i++) {
+            for(int i = 0; i < r*2-2; i++) {
                 if(i % 2 == 0) {
-                    if(i < radius) {
+                    if(i < r) {
                         Screen.DrawPixel(drawX-i, drawY);
                     }
-                    Screen.DrawPixel(drawX, drawY+i-radius+1);
+                    Screen.DrawPixel(drawX, drawY+i-r+1);
 
                 }
             }
@@ -24,13 +24,13 @@ namespace LibCast {
             
             double angle = -pitch * (Math.PI / 180.0);
             
-            int endX = drawX - (int)((radius-1) * Math.Cos(angle));
-            int endY = drawY + (int)((radius-1) * Math.Sin(angle));
+            int endX = drawX - (int)((r-1) * Math.Cos(angle));
+            int endY = drawY + (int)((r-1) * Math.Sin(angle));
             
             Screen.DrawLine(drawX, drawY, endX, endY);
 
             Screen.Fill(Color.Green);
-            Screen.DrawCircle(drawX, drawY, radius);
+            Screen.DrawCircle(drawX, drawY, r);
 
         }
 

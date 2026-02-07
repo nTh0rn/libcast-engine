@@ -28,10 +28,11 @@ namespace LibCast {
         public double y;
         public double z;
         public virtual double direction { get; set; }
-        public virtual double radius { get; set;  }
+        public virtual double radius { get; set;  } = 0;
         public virtual EntityTexture? texture {get; set;}
         public virtual double traversalScale {get; set;} = 0.1;
         public int priority = 0;
+        public virtual bool solid {get; set;} = false;
         
         public bool CollisionPoint(double pointX, double pointY) {
             return Math.Sqrt(Math.Pow(x-pointX, 2)+Math.Pow(y-pointY, 2)) <= radius;
@@ -63,7 +64,8 @@ namespace LibCast {
             if(Game.room.room[(ix, iy)] is SolidCell) return false;
             
             foreach(Entity entity in Game.room.entitiesInRange) {
-                if(entity != this && entity.CollisionEntity(this)) return false;
+                if(entity == this || entity.solid == false) continue;
+                if(entity.CollisionEntity(this)) return false;
             }
             return true;
         }

@@ -77,7 +77,7 @@ namespace LibCast {
         public static double waitTime = 0;
         public static double deltaTime = 0;
         public static double timeCounter = 0;
-        public static int targetFPS = 60;
+        public static int targetFPS = 30;
         public static bool pause = false;
 
         public static Font smallTextFont;
@@ -167,9 +167,7 @@ namespace LibCast {
                     Raylib.DrawRectangle(x * pixelScale, y * pixelScale, pixelScale, pixelScale, screen[y][x].fillColor);
                     //Raylib.DrawPixel(x, y, screen[y][x].fillColor);
                     if (screen[y][x].character != ' ') {
-                        for (int i = 0; i < 5; i++) {
-                            Raylib.DrawTextEx(smallTextFont, screen[y][x].character.ToString(), new Vector2(x * pixelScale, y * pixelScale + 3), Screen.pixelScale * 2, 0, screen[y][x].strokeColor);
-                        }
+                        Raylib.DrawTextEx(smallTextFont, screen[y][x].character.ToString(), new Vector2(x * pixelScale, y * pixelScale + 3), Screen.pixelScale * 2, 0, screen[y][x].strokeColor);
                     }
                 }
             }

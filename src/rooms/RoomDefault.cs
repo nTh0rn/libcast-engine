@@ -22,6 +22,7 @@ namespace LibCast {
             //room[2][2] = new EmptyCell(2, 2, ' ');
             AddEntity(new Player(2,2));
             AddEntity(new JennEntity(2, 3));
+            AddEntity(new Camera(3,2));
 
             // for(int i = 0; i < getHeight(); i++) {
             //     for(int j = 0; j < getWidth(i); j++) {
@@ -34,14 +35,12 @@ namespace LibCast {
         }
 
         public override void Loop() {
-            UpdateEntitiesInRange();
             if(UI.gameState != GameState.PLAY) {
                 return;
             }
-            foreach (Entity entity in entitiesInRange) {
-                entity.Loop();
-            }
-            //DrawTopDown(0,0);
+            
+            LoopEntities();
+
         }
     }
 }

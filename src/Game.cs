@@ -14,7 +14,7 @@ namespace LibCast {
 
         // Initialization, the first thing ran upon booting.
         public static void Init() {
-            LoadRoom("rmDefault");
+            LoadRoom("rmProcedural");
             
         }
 

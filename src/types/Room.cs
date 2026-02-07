@@ -117,8 +117,8 @@ namespace LibCast {
         public List<Entity> entitiesInRange = new List<Entity>();
         public Dictionary<string, Texture> textures = new Dictionary<string, Texture>();
         public Player? player = null;
-        public int renderDistance = 3;
         public int chunkSize = 8;
+        public int renderDistance = Raycaster.maxRaySurfaces*2/8;
 
 
         public Room() {
@@ -173,11 +173,11 @@ namespace LibCast {
             int width = img.Width;
             int height = img.Height;
 
-            if(width % 256 != 0) {
-                img = Raylib.LoadImage("src/assets/textures/error.png");
-                width = 256;
-                height = 256;
-            }
+            // if(width % 256 != 0) {
+            //     img = Raylib.LoadImage("src/assets/textures/error_wrong_size.png");
+            //     width = 256;
+            //     height = 256;
+            // }
 
             // if(width % 256 != 0 || height % 256 != 0) {
             //     img = Raylib.LoadImage("src/assets/textures/error.png");
@@ -296,6 +296,20 @@ namespace LibCast {
             }
             if(entity is Player) {
                 player = (Player)entity;
+            }
+        }
+
+        public void LoopEntities() {
+            UpdateEntitiesInRange();
+            if(UI.gameState != GameState.PLAY) {
+                return;
+            }
+            if(player != null) {
+                player.Loop();
+            }
+            foreach(Entity entity in entitiesInRange) {
+                if(entity is Player) continue;
+                entity.Loop();
             }
         }
 
