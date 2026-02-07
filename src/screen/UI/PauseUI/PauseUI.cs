@@ -20,7 +20,7 @@ namespace LibCast {
         public static void Loop() {
             Raycaster.Go(Game.room.player, Game.room, 0, 0, Screen.gameWidth, Screen.gameHeight);
             DrawBackground(0, 0, 0, 100);
-            DrawText("Why the fuck u pause lol", 20, 50);
+            DrawText("Game Paused", 20, 50);
             
             StartCollisionDraw(playButton);
             Fill(pauseState == PauseState.RESUME ? Color.White : Color.Black);
