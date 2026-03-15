@@ -31,6 +31,7 @@ namespace LibCast {
         public virtual double radius { get; set;  } = 0;
         public virtual EntityTexture? texture {get; set;}
         public virtual double traversalScale {get; set;} = 0.1;
+        public virtual double lookScale {get; set;} = 0.1;
         public int priority = 0;
         public virtual bool solid {get; set;} = false;
         
@@ -71,8 +72,8 @@ namespace LibCast {
         }
 
         public void moveDirection(double dir) {
-            double dx = Math.Cos((dir) * (Math.PI / 180.0)) * traversalScale * Screen.deltaTime;
-            double dy = -Math.Sin((dir) * (Math.PI / 180.0)) * traversalScale * Screen.deltaTime;
+            double dx = Math.Cos((dir) * (Math.PI / 180.0)) * traversalScale * Screen.deltaTimeRatio;
+            double dy = -Math.Sin((dir) * (Math.PI / 180.0)) * traversalScale * Screen.deltaTimeRatio;
             double oldX = x, oldY = y;
 
             if(KeyDown(KeyboardKey.LeftShift)) {

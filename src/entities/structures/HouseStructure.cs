@@ -19,6 +19,7 @@ namespace LibCast {
 
         public void Build() {
             Console.WriteLine("Building at " + x + " " + y);
+            Game.room.AddEntity(new RockEntity(10, 10));
             WallCell wallTall = new WallCell(x, y);
             wallTall.texture.SetAllWalls("src/assets/textures/rock_wall_tall.png");
 
@@ -65,8 +66,6 @@ namespace LibCast {
             wallNorth.texture.eastOut = "src/assets/textures/stone_wood_wall_tall.png";
             wallNorth.texture.westOut = "src/assets/textures/stone_wood_wall_tall.png";
 
-
-
             WallCell wallSouth = new WallCell(x, y);
             wallSouth.texture.SetAllWalls("src/assets/textures/rock_wall_tall.png");
             wallSouth.texture.eastOut = "src/assets/textures/stone_wood_wall_tall.png";
@@ -80,9 +79,6 @@ namespace LibCast {
             EmptyCell inside = new EmptyCell(x, y);
             inside.texture.bottom = "src/assets/textures/dirt.png";
             inside.texture.top = "src/assets/textures/wood_wall.png";
-
-
-
 
             for(int w = 0; w < houseWidth; w++) {
                 for(int h = 0; h < houseHeight; h++) {

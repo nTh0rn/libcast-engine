@@ -3,12 +3,13 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace LibCast {
-    public class Player : Raycastable {
+    public class PlayerEntity : Raycastable {
         public override bool running { get; set; } = true;
         public override double direction { get; set; } = 0;
         public override double radius { get; set; } = 0.10;
         public override double pitch {get; set;} = 0;
         public override int pitchRange {get; set;} = 144;
+        public double lookSpeed = 10; // for keyboard looking only, mouse delta replaces this when using a mouse
         public double mouseSensitivity {get; set;} = 1;
         public double gravityAcceleration {get; set;} = -.2;
         public double gravityVelocity {get; set;} = 0;
@@ -18,30 +19,28 @@ namespace LibCast {
         "src/assets/textures/shai_back.png");
 
 
-        public Player(int x, int y) {
+        public PlayerEntity(int x, int y) {
             this.x = x;
             this.y = y;
         }
 
 
         public override bool Loop() {
-
-            
-
+            CheckShift();
             MouseControl();
             
             if (KeyDown(KeyboardKey.J) || KeyDown(KeyboardKey.Left)) {
-                direction += (KeyDown(KeyboardKey.LeftShift) ? 6 : 3)*Screen.deltaTime;
+                direction += 10 * lookSpeed*lookScale*Screen.deltaTimeRatio;
             }
             if (KeyDown(KeyboardKey.L) || KeyDown(KeyboardKey.Right)) {
-                direction -= (KeyDown(KeyboardKey.LeftShift) ? 6 : 3)*Screen.deltaTime;
+                direction -= 10 * lookSpeed*lookScale*Screen.deltaTimeRatio;
             }
             if (KeyDown(KeyboardKey.I) || KeyDown(KeyboardKey.Up)) {
-                pitch += (KeyDown(KeyboardKey.LeftShift) ? 6 : 3)*Screen.deltaTime;
+                pitch += 10 * lookSpeed*lookScale*Screen.deltaTimeRatio;
                 if(pitch > pitchRange) pitch = pitchRange;
             }
             if (KeyDown(KeyboardKey.K) || KeyDown(KeyboardKey.Down)) {
-                pitch -= (KeyDown(KeyboardKey.LeftShift) ? 6 : 3)*Screen.deltaTime;
+                pitch -= 10 * lookSpeed*lookScale*Screen.deltaTimeRatio;
                 if(pitch < -pitchRange) pitch = -pitchRange;
             }
 
@@ -70,7 +69,7 @@ namespace LibCast {
             }
 
             
-            z += gravityVelocity * Screen.deltaTime;
+            z += gravityVelocity * Screen.deltaTimeRatio;
 
             gravityVelocity += gravityAcceleration;
 
@@ -89,12 +88,12 @@ namespace LibCast {
 
         private void MouseControl() {
             Vector2 mouseDelta = Raylib.GetMouseDelta();
-            direction -= mouseDelta[0]*Screen.deltaTime;
+            direction -= mouseDelta[0]*lookScale*Screen.deltaTimeRatio;
             Raylib.SetMousePosition(Screen.windowWidth/2,Screen.windowHeight/2);
             if(!Raylib.IsCursorHidden()) {
                 Raylib.HideCursor();
             }
-            pitch -= mouseDelta[1]*Screen.deltaTime;
+            pitch -= mouseDelta[1]*lookScale*Screen.deltaTimeRatio;
             if(pitch > pitchRange) pitch = pitchRange;
             if(pitch < -pitchRange) pitch = -pitchRange;
         }
@@ -128,6 +127,9 @@ namespace LibCast {
 
         }
 
+        public void CheckShift() {
+            lookSpeed = 10 * (KeyDown(KeyboardKey.LeftShift) ? 2 : 1);
+        }
 
     }
 }

@@ -28,6 +28,7 @@ namespace LibCast {
         }
     }
 
+
     public class SolidCell : RoomCell {
         public SolidCell(double x, double y) : base(x, y) {}
     }

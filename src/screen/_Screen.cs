@@ -7,6 +7,7 @@ namespace LibCast {
         public Color strokeColor {get; set;}= Screen.emptyColor;
         public int depth {get; set;} = int.MaxValue;
         public char character {get; set;} = ' ';
+        public int fontSize {get; set;} = Screen.pixelScale*2;
         public MouseCollision ?collisionFamily {get; set;}
 
         public Pixel(Color fillColor) {
@@ -28,18 +29,20 @@ namespace LibCast {
             this.collisionFamily = collisionFamily;
         }
 
-        public Pixel(Color fillColor, Color strokeColor, char character, MouseCollision? collisionFamily = null) {
+        public Pixel(Color fillColor, Color strokeColor, char character, int fontSize, MouseCollision? collisionFamily = null) {
             this.fillColor = fillColor;
             this.strokeColor = strokeColor;
             this.character = character;
+            this.fontSize = fontSize;
             this.collisionFamily = collisionFamily;
         }
 
-        public Pixel(Color fillColor, Color strokeColor, int depth, char character, MouseCollision? collisionFamily = null) {
+        public Pixel(Color fillColor, Color strokeColor, int depth, char character, int fontSize, MouseCollision? collisionFamily = null) {
             this.fillColor = fillColor;
             this.strokeColor = strokeColor;
             this.depth = depth;
             this.character = character;
+            this.fontSize = fontSize;
             this.collisionFamily = collisionFamily;
         }
     }
@@ -52,7 +55,7 @@ namespace LibCast {
         public static readonly (int width, int height) playGameResolution = (320, 180);
         public static readonly (int width, int height) menuGameResolution = (128, 72);
 
-        public static readonly (int width, int height) playBufferResolution = (320, 180);
+        public static readonly (int width, int height) playBufferResolution = (1280, 720);
         public static readonly (int width, int height) menuBufferResolution = (1280, 720);
 
         //Game scaling 
@@ -74,8 +77,9 @@ namespace LibCast {
         public static double updateDrawTime = 0;
         public static double waitTime = 0;
         public static double deltaTime = 0;
+        public static double deltaTimeRatio = 0;
         public static double timeCounter = 0;
-        public static int targetFPS = 30;
+        public static int targetFPS = 60;
         public static bool pause = false;
 
         public static Font smallTextFont;
@@ -99,7 +103,11 @@ namespace LibCast {
             Raylib.InitWindow(1280, 720, "Libcast");
             Raylib.SetWindowMinSize(640, 360);
             ApplyBuffer();
-            smallTextFont = Raylib.LoadFontEx("src/assets/font/consolas.ttf", 16, null, 0);
+            //smallTextFont = Raylib.LoadFontEx("src/assets/font/consolas.ttf", 16, null, 0);
+            //smallTextFont = Raylib.LoadFontEx("src/assets/font/pixeled2.ttf", 32, null, 0);
+            smallTextFont = Raylib.LoadFontEx("src/assets/font/custom.ttf", 128, null, 0);
+            Raylib.SetTextureFilter(smallTextFont.Texture, TextureFilter.Point);
+
             Raylib.SetTargetFPS(targetFPS);
 
         }
@@ -145,11 +153,8 @@ namespace LibCast {
                 ToggleFullscreen();
             }
 
-            currentTime = Raylib.GetTime();
-            updateDrawTime = currentTime - previousTime;
-            double targetFrameTime = 1.0 / targetFPS;
-            deltaTime = updateDrawTime / targetFrameTime / 2;
-            previousTime = currentTime;
+            deltaTime = Raylib.GetFrameTime();
+            deltaTimeRatio = targetFPS/(1.0/deltaTime);
         }
 
         public static void Close() {
@@ -159,18 +164,19 @@ namespace LibCast {
 
 
         public static void Draw() {
-            //return;
+            int fontPixelScale = (int)(pixelScale/6.0);
             for (int y = screen.Count - 1; y >= 0; y--) {
                 for (int x = screen[y].Count - 1; x >= 0; x--) {
                     Raylib.DrawRectangle(x * pixelScale, y * pixelScale, pixelScale, pixelScale, screen[y][x].fillColor);
-                    //Raylib.DrawPixel(x, y, screen[y][x].fillColor);
                     if (screen[y][x].character != ' ') {
-                        Raylib.DrawTextEx(smallTextFont, screen[y][x].character.ToString(), new Vector2(x * pixelScale, y * pixelScale + 3), Screen.pixelScale * 2, 0, screen[y][x].strokeColor);
+                        char character = screen[y][x].character;
+                        int fontSize = screen[y][x].fontSize*pixelScale;
+                        if (fontSize < 0) fontSize = pixelScale*2;
+                        Raylib.DrawTextEx(smallTextFont, character.ToString(), new Vector2(x * pixelScale+fontPixelScale, (int)(y * pixelScale+fontPixelScale*3)),(int) (fontSize*(1-1.0/6.0)) , 0, screen[y][x].strokeColor);
+
                     }
                 }
             }
-            
-            //Terminal.DrawCursor();
         }
 
         public static void Resize() {
@@ -208,58 +214,35 @@ namespace LibCast {
 
 
 
-        public static void DrawPixel(int x, int y, char character, Color color, int depth) {
+        public static void DrawPixel(int x, int y, Color color, int depth, char character, int fontSize) {
             byte a = color.A;
             if (a != 255) {
                 int r = (color.R * a + screen[y][x].fillColor.R * (255 - a)) / 255;
                 int g = (color.G * a + screen[y][x].fillColor.G * (255 - a)) / 255;
                 int b = (color.B * a + screen[y][x].fillColor.B * (255 - a)) / 255;
-                screen[y][x] = new Pixel(new Color(r, g, b, 255), strokeColor, depth, ' ', currentMouseCollision);
+                screen[y][x] = new Pixel(new Color(r, g, b, 255), strokeColor, depth, ' ', fontSize, currentMouseCollision);
             } else {
-                screen[y][x] = new Pixel(color, strokeColor, depth, character, currentMouseCollision);
+                screen[y][x] = new Pixel(color, strokeColor, depth, character, fontSize, currentMouseCollision);
             }
         }
 
-        // public static void DrawPixel(int x, int y, char character, Color color, int depth) {
-        //     byte a = color.A;
-        //     if (a < 255) {
-        //         // Apply Bayer dithering for transparency
-        //         int ditherX = x % 4;
-        //         int ditherY = y % 4;
-        //         int ditherThreshold = (bayerMatrix4x4[ditherY, ditherX] + 1) * 16; // 16-255 range (16 levels)
-                
-        //         if (a < ditherThreshold) {
-        //             // Don't draw - keep background
-        //             return;
-        //         }
-        //     }
-            
-        //     // Draw at 100% opacity
-        //     Color opaqueColor = new Color(color.R, color.G, color.B, (byte)255);
-        //     screen[y][x] = new Pixel(color, strokeColor, depth, character, currentMouseCollision);
-        // }
+        public static void DrawPixel(int x, int y, Color color, int depth=int.MaxValue) {
+            DrawPixel(x, y, color, depth, ' ', 0);
+        }
         
-        public static void DrawPixel(int x, int y, char character=' ', int depth=int.MaxValue) {
-            DrawPixel(x, y, character, fillColor, depth);
+        public static void DrawPixel(int x, int y, int depth=int.MaxValue,  char character=' ', int fontSize=-1) {
+            DrawPixel(x, y, fillColor, depth, character, fontSize);
         }
 
-        public static void DrawPixel(int x, int y, Color color) {
-            DrawPixel(x, y, ' ', color, int.MaxValue);
-        }
-
-        public static void DrawPixel(int x, int y, int depth, Color color) {
-            DrawPixel(x, y, ' ', color, depth);
-        }
-
-        public static void DrawPixelDepth(int x, int y, int depth, Color color) {
+        public static void DrawPixelDepth(int x, int y, Color color, int depth) {
             if(screen[y][x].depth >= depth) {
-                DrawPixel(x, y, depth, color);
+                DrawPixel(x, y, color, depth, ' ', 0);
             }
             //DrawPixel(x, y, depth, color);
         }
 
         public static void DrawPixelDepth(int x, int y, int depth) {
-            DrawPixelDepth(x, y, depth, fillColor);
+            DrawPixelDepth(x, y, fillColor, depth);
         }
 
         
@@ -296,16 +279,32 @@ namespace LibCast {
             Stroke(color, color, color);
         }
 
-        public static void DrawText(string input, int x, int y, bool FillBackground=false) {
-            int xOffset = 0;
-            foreach (char character in input) {
-                Pixel pixel = new Pixel(FillBackground ? fillColor : screen[y][xOffset].fillColor, strokeColor, character, currentMouseCollision);
-                if(FillBackground) {
-                    screen[y+1][x + xOffset] = new Pixel(fillColor, strokeColor, screen[y+1][xOffset].character, currentMouseCollision);
+        // public static void DrawText(string input, int x, int y, int fontSize=-1, bool FillBackground=false) {
+        //     int xOffset = 0;
+        //     foreach (char character in input) {
+        //         Pixel pixel = new Pixel(FillBackground ? fillColor : screen[y][xOffset].fillColor, strokeColor, character, fontSize, currentMouseCollision);
+        //         if(FillBackground) {
+        //             screen[y+1][x + xOffset] = new Pixel(fillColor, strokeColor, screen[y+1][xOffset].character, fontSize, currentMouseCollision);
+        //         }
+        //         screen[y][x + xOffset] = pixel;
+        //         xOffset++;
+
+        //     }
+        // }
+
+        public static void DrawText(string input, int x, int y, int fontSize=-1, bool FillBackground=false) {
+            int pixelsPerCharacter = (int)Math.Ceiling(Math.Max(1.0, fontSize/2.0));
+            if(FillBackground) {
+                DrawRect(x, y, input.Length * pixelsPerCharacter, fontSize);
+            }
+            for(int xOffset = 0; xOffset < input.Length*pixelsPerCharacter; xOffset++) {
+                Pixel pixel;
+                if(xOffset % pixelsPerCharacter == 0) {
+                    pixel = new Pixel(FillBackground ? fillColor : screen[y][x+xOffset].fillColor, strokeColor, input[(int)(xOffset / pixelsPerCharacter)], fontSize, currentMouseCollision);
+                } else {
+                    pixel = new Pixel(FillBackground ? fillColor : screen[y][x+xOffset].fillColor, strokeColor, ' ', 0, currentMouseCollision);
                 }
                 screen[y][x + xOffset] = pixel;
-                xOffset++;
-
             }
         }
 
@@ -380,7 +379,10 @@ namespace LibCast {
         public static void DrawFPS() {
             Color oldStroke = strokeColor;
             Stroke(Color.Green);
-            DrawText(Raylib.GetFPS().ToString(), 0, 0);
+            DrawText(Raylib.GetFPS().ToString(), 0, 0, 6);
+            DrawText(deltaTime.ToString(), 0, 8, 6);
+            DrawText(deltaTimeRatio.ToString(), 0, 16, 6);
+
             Stroke(oldStroke);
         }
 
@@ -453,7 +455,7 @@ namespace LibCast {
                     if (c.A == 0) continue;
 
                     if (depth != null) {
-                        Screen.DrawPixelDepth(sx, sy, (int)depth, c);
+                        Screen.DrawPixelDepth(sx, sy, c, (int)depth);
                     } else {
                         Screen.DrawPixel(sx, sy, c);
                     }

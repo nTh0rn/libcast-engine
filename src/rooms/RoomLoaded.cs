@@ -1,15 +1,11 @@
 namespace LibCast {
-    public class RoomProcedural : Room {
-        public override string name {get; set;} = "rmProcedural";
+    public class RoomLoaded : Room {
+        public override string name {get; set;} = "rmLoaded";
         public override List<List<char>>? roomAsArray {get; set;} = new List<List<char>>();
         public override string? skyboxTexture {get; set;} = "src/assets/textures/sky.png";
 
-        public RoomProcedural() : base(){
-            AddEntity(new PlayerEntity(4,4));
-            AddEntity(new ShaiEntity(2, 3));
-            AddEntity(new BadBunnieEntity(3, 3, "no"));
-
-            AddEntity(new Camera(0, 0));
+        public RoomLoaded() : base(){
+            LoadRoomFromJson("src/assets/rooms/testRoom.json");
             LoadTextures();
         }
 
@@ -61,5 +57,6 @@ namespace LibCast {
                 }
             }
         }
+
     }
 }

@@ -20,24 +20,25 @@ namespace LibCast {
         public static void Loop() {
             Raycaster.Go(Game.room.player, Game.room, 0, 0, Screen.gameWidth, Screen.gameHeight);
             DrawBackground(0, 0, 0, 100);
-            DrawText("Game Paused", 20, 50);
+            DrawText("Game Paused, abcdefghijklmnopqrstuvwxyz 1234567890", 20, 50);
+            DrawText("WWWWwwwww", 50, 50);
             
             StartCollisionDraw(playButton);
             Fill(pauseState == PauseState.RESUME ? Color.White : Color.Black);
             Stroke(pauseState == PauseState.RESUME ? Color.Black : Color.White);
-            DrawText("RESUME", 4, 4, true);
+            DrawText("RESUME", 4, 4, 4, true);
             EndCollisionDraw();
 
             StartCollisionDraw(settingsButton);
             Fill(pauseState == PauseState.SETTINGS ? Color.White : Color.Black);
             Stroke(pauseState == PauseState.SETTINGS ? Color.Black : Color.White);
-            DrawText("SETTINGS", 4, 8, true);
+            DrawText("SETTINGS", 4, 8, 2, true);
             EndCollisionDraw();
             
             StartCollisionDraw(exitButton);
             Fill(pauseState == PauseState.EXIT ? Color.White : Color.Black);
             Stroke(pauseState == PauseState.EXIT ? Color.Black : Color.White);
-            DrawText("EXIT", 4, 12, true);
+            DrawText("EXIT", 4, 12, 2, true);
             EndCollisionDraw();
 
             if(Raylib.IsCursorHidden()) {

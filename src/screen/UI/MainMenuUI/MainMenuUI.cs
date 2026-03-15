@@ -23,13 +23,13 @@ namespace LibCast {
             StartCollisionDraw(playButton);
             Fill(mainMenuState == MainMenuState.PLAY ? Color.White : Color.Black);
             Stroke(mainMenuState == MainMenuState.PLAY ? Color.Black : Color.White);
-            DrawText("PLAY", 4, 4, true);
+            DrawText("PLAY", 4, 4, 2, true);
             EndCollisionDraw();
 
             StartCollisionDraw(exitButton);
             Fill(mainMenuState == MainMenuState.EXIT ? Color.White : Color.Black);
             Stroke(mainMenuState == MainMenuState.EXIT ? Color.Black : Color.White);
-            DrawText("EXIT", 4, 8, true);
+            DrawText("EXIT", 4, 8, 2, true);
             EndCollisionDraw();
 
 

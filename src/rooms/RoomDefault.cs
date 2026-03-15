@@ -2,7 +2,7 @@ namespace LibCast {
     public class RoomDefault : Room {
         public override string name {get; set;} = "rmDefault";
         //public override List<List<char>> roomRaw {get; set;} = MazeGeneration.GenerateMaze(100, 100);
-         public override List<List<char>> roomAsArray {get; set;} = new List<List<char>>(){
+         public override List<List<char>>? roomAsArray {get; set;} = new List<List<char>>(){
             new List<char>{'#','#','#','#','#','#','#'},
             new List<char>{'#',' ',' ',' ',' ',' ','#'},
             new List<char>{'#',' ',' ',' ',' ','#','#'},
@@ -19,7 +19,7 @@ namespace LibCast {
         public override string? skyboxTexture {get; set;} = "src/assets/textures/sky.png";
 
         public RoomDefault() : base() {
-            AddEntity(new Player(2,2));
+            AddEntity(new PlayerEntity(2,2));
             AddEntity(new ShaiEntity(2, 3));
             AddEntity(new Camera(3,2));
             LoadTextures();

@@ -1,0 +1,33 @@
+{
+    "name": "testRoom",
+    "cells": [
+        {"type" : "EmptyCell",
+        "id": 0,
+        "textures": [
+            {"bottom": "src/assets/textures/grass.png"},
+            {"southOut": "src/assets/textures/grass.png"}
+        ]},
+        {"type" : "WallCell",
+        "id": 1,
+        "textures": [
+            {"southOut": "src/assets/textures/rock.png"}
+        ]},
+        {"type" : "WallCell",
+        "id": 2,
+        "textures": [
+            {"southOut": "src/assets/textures/tree.png"}
+        ]}
+    ],
+    "map": [[0, 0, 0, 0, -1],
+            [0, 1, 0, 0, -1],
+            [-1, 1, 0, 0, -1],
+            [-1, 0, 0, 2, -1],
+            [-1, 2, 0, 0, -1]],
+    "entities": [ 
+        {"type": "PlayerEntity",
+        "param": [0, 0]},
+        {"type": "BadBunnieEntity",
+        "param": [2.5, 2.5, "custom name"],
+        "count": 2}
+    ]
+}

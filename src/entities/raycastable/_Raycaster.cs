@@ -82,6 +82,7 @@ namespace LibCast {
 
                     if (hitVertical) { if (dx < 0) offset = 1.0 - offset; }
                     else { if (dy > 0) offset = 1.0 - offset; }
+
                     DrawRayTexture(wall.distance, offset, wall.texture, room.textureBitmaps[wall.texture].height, col);
                 }
 
@@ -89,9 +90,9 @@ namespace LibCast {
             });
 
 
-            if(pov is Player) {
-            Screen.DrawText(pov.x + " " + pov.y, 10, 10);
-            }
+            // if(pov is Player) {
+            //     Screen.DrawText(pov.x + " " + pov.y, 10, 10);
+            // }
         }
 
         private static bool inBounds(double x, double y) {
@@ -197,7 +198,7 @@ namespace LibCast {
                 Color c = room.textureBitmaps[stringTexture].texture[texY, texX];
                 if (c.A == 0) continue;
 
-                Screen.DrawPixelDepth(column + xPosition, y + yPosition, (int)(distance * 100)+viewDepth, c); 
+                Screen.DrawPixelDepth(column + xPosition, y + yPosition, c, (int)(distance * 100)+viewDepth); 
             }
         }
 
@@ -279,7 +280,7 @@ namespace LibCast {
 
             Color c = room.textureBitmaps[textureKey].texture[texY, texX];
             if(c.A == 0) return;
-            Screen.DrawPixelDepth(column + xPosition, y + yPosition, (int)(depthPerp * 100)+viewDepth, c);
+            Screen.DrawPixelDepth(column + xPosition, y + yPosition, c, (int)(depthPerp * 100)+viewDepth);
         }
 
         private static void DrawEntities(double viewAngle)

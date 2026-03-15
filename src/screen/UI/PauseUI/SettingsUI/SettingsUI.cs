@@ -26,13 +26,13 @@ namespace LibCast {
             StartCollisionDraw(fullscreenButton);
             Fill(settingsState == SettingsState.FULLSCREEN ? Color.White : Color.Black);
             Stroke(settingsState == SettingsState.FULLSCREEN ? Color.Black : Color.White);
-            DrawText("FULLSCREEN - " + (IsFullscreen() ? "ON" : "OFF"), 4, 4, true);
+            DrawText("FULLSCREEN - " + (IsFullscreen() ? "ON" : "OFF"), 4, 4, 2, true);
             EndCollisionDraw();
 
             StartCollisionDraw(fovButton);
             Fill(settingsState == SettingsState.FOV ? Color.White : Color.Black);
             Stroke(settingsState == SettingsState.FOV ? Color.Black : Color.White);
-            DrawText("FOV", 4, 8, true);
+            DrawText("FOV", 4, 8, 2, true);
             
 
             Fill(Color.Black);
@@ -47,10 +47,10 @@ namespace LibCast {
             //Console.WriteLine((int)(((Raycaster.FOV-60.0)/70.0)*36.0));
             Stroke(Color.Gray);
             Fill(Color.Black);
-            DrawText("(use arrow keys)", FOVTextOffset > 18 ? 11 : 33, 9, true);
+            DrawText("(use arrow keys)", FOVTextOffset > 18 ? 11 : 33, 9, 2, true);
             Stroke(Color.White);
             Fill(Color.Gray);
-            DrawText(Raycaster.FOV.ToString(), 11+FOVTextOffset, 9, true);
+            DrawText(Raycaster.FOV.ToString(), 11+FOVTextOffset, 9, 2, true);
 
             Fill(Color.White);
             DrawPixel(11+FOVSliderOffset, 8);
@@ -59,7 +59,7 @@ namespace LibCast {
             StartCollisionDraw(returnButton);
             Fill(settingsState == SettingsState.EXIT ? Color.White : Color.Black);
             Stroke(settingsState == SettingsState.EXIT ? Color.Black : Color.White);
-            DrawText("RETURN", 4, 12, true);
+            DrawText("RETURN", 4, 12, 2, true);
             EndCollisionDraw();
 
 
