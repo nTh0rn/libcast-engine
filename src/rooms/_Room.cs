@@ -278,6 +278,13 @@ namespace LibCast {
 
     
         public TextureBitmap GetTexture(string textureString) {
+            if(!textureString.StartsWith("src/assets/textures/") && !textureString.StartsWith("/src/assets/textures")) {
+                if(textureString.StartsWith('/')) {
+                    textureString = "src/assets/textures"+textureString;
+                } else {
+                    textureString = "src/assets/textures/"+textureString;
+                }
+            }
             return textureBitmaps[textureString];
         }
 
@@ -285,9 +292,18 @@ namespace LibCast {
         
 
         private void LoadTextureFromPath(string texturePath) {
-            if (texturePath == null || textureBitmaps.ContainsKey(texturePath)) {
+            if(texturePath == null) return;
+            if(!texturePath.StartsWith("src/assets/textures/") && !texturePath.StartsWith("/src/assets/textures")) {
+                if(texturePath.StartsWith('/')) {
+                    texturePath = "src/assets/textures" + texturePath;
+                } else {
+                    texturePath = "src/assets/textures/" + texturePath;
+                }
+            }
+            if (textureBitmaps.ContainsKey(texturePath)) {
                 return;
             }
+
             
             if (!File.Exists(texturePath)) {
                 texturePath = "src/assets/textures/error.png";
@@ -318,7 +334,10 @@ namespace LibCast {
 
             for(int i = 0; i < textureFiles.Count(); i++) {
                 textureFiles[i] = textureFiles[i].Replace("\\", "/");
-                textureFiles[i] = textureFiles[i].Replace("\\", "/");
+                // Normalize to relative path starting with "src/assets/textures/"
+                if (textureFiles[i].Contains("src/assets/textures/")) {
+                    textureFiles[i] = textureFiles[i].Substring(textureFiles[i].IndexOf("src/assets/textures/"));
+                }
             }
 
             foreach(string texture in textureFiles) {

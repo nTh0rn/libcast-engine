@@ -5,7 +5,7 @@ namespace LibCast {
         public override bool running { get; set; } = true;
         public override double direction { get; set; } = 0;
         public override double radius { get; set; } = 0.20;
-        public override EntityTexture? texture {get; set;} = new EntityTexture("src/assets/textures/rock.png");
+        public override EntityTexture? texture {get; set;} = new EntityTexture("rock.png");
 
         public RockEntity(double x, double y) {
             this.x = x;

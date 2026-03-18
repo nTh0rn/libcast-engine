@@ -2,7 +2,7 @@ namespace LibCast {
     public class RoomProcedural : Room {
         public override string name {get; set;} = "rmProcedural";
         public override List<List<char>>? roomAsArray {get; set;} = new List<List<char>>();
-        public override string? skyboxTexture {get; set;} = "src/assets/textures/sky.png";
+        public override string? skyboxTexture {get; set;} = "sky.png";
 
         public RoomProcedural() : base(){
             AddEntity(new PlayerEntity(4,4));

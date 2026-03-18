@@ -16,7 +16,7 @@ namespace LibCast {
             new List<char>{'#',' ',' ',' ',' ','a','#'},
             new List<char>{'#',' ',' ',' ',' ',' ','#'},
             new List<char>{'#','#','#','#','#','#','#'}};
-        public override string? skyboxTexture {get; set;} = "src/assets/textures/sky.png";
+        public override string? skyboxTexture {get; set;} = "sky.png";
 
         public RoomDefault() : base() {
             AddEntity(new PlayerEntity(2,2));

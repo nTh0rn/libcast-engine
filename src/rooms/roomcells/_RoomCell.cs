@@ -35,7 +35,7 @@ namespace LibCast {
 
     public class EmptyCell : RoomCell {
         public EmptyCell(double x, double y) : base(x, y) {
-            texture.bottom = "src/assets/textures/grass.png";
+            texture.bottom = "grass.png";
         }
     }
 }

@@ -6,7 +6,7 @@ namespace LibCast {
     public class Camera : Raycastable {
         public override double pitch {get; set;} = 0;
         public override int pitchRange {get; set;} = 256;
-        public override EntityTexture? texture {get; set;} = new EntityTexture("src/assets/textures/camera.png");
+        public override EntityTexture? texture {get; set;} = new EntityTexture("camera.png");
 
         public Camera(int x, int y) {
             this.x = x;

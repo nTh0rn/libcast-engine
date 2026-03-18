@@ -1,28 +1,28 @@
 namespace LibCast {
     public class BrickCell : WallCell {
         public BrickCell(double x, double y) : base(x, y) {
-            texture.SetOutTextures("src/assets/textures/tree_tall.png");
+            texture.SetOutTextures("tree_tall.png");
         }
     }
 
     public class DarkBrickWall : WallCell {
         public DarkBrickWall(double x, double y) : base(x, y) {
-            texture.SetOutTextures("src/assets/textures/dark_cobblestone.png");
+            texture.SetOutTextures("dark_cobblestone.png");
         }
     }
 
     public class DoorCell : RoomCell {
         public DoorCell(double x, double y) : base(x, y) {
-            texture = new TextureMap("src/assets/textures/half_transparent.png",
-            "src/assets/textures/direction_test/bottom.png",
-            "src/assets/textures/direction_test/wo.png",
-            "src/assets/textures/direction_test/eo.png",
-            "src/assets/textures/direction_test/no.png",
-            "src/assets/textures/direction_test/so.png",
-            "src/assets/textures/direction_test/wi.png",
-            "src/assets/textures/direction_test/ei.png",
-            "src/assets/textures/direction_test/ni.png",
-            "src/assets/textures/half_transparent.png");
+            texture = new TextureMap("half_transparent.png",
+            "direction_test/bottom.png",
+            "direction_test/wo.png",
+            "direction_test/eo.png",
+            "direction_test/no.png",
+            "direction_test/so.png",
+            "direction_test/wi.png",
+            "direction_test/ei.png",
+            "direction_test/ni.png",
+            "half_transparent.png");
         }
     }
 }

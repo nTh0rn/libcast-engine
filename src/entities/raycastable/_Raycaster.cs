@@ -83,7 +83,7 @@ namespace LibCast {
                     if (hitVertical) { if (dx < 0) offset = 1.0 - offset; }
                     else { if (dy > 0) offset = 1.0 - offset; }
 
-                    DrawRayTexture(wall.distance, offset, wall.texture, room.textureBitmaps[wall.texture].height, col);
+                    DrawRayTexture(wall.distance, offset, wall.texture, room.GetTexture(wall.texture).height, col);
                 }
 
                 
@@ -174,17 +174,29 @@ namespace LibCast {
         }
 
         private static void DrawRayTexture(double distance, double xPos, string? stringTexture, int wallHeight, int column) {
-            if (stringTexture == null || !room.textureBitmaps.TryGetValue(stringTexture, out var texture)) return;
+            if (stringTexture == null) return;
+            
+            // Normalize the texture key before looking it up
+            string normalizedKey = stringTexture;
+            if(!normalizedKey.StartsWith("src/assets/textures/") && !normalizedKey.StartsWith("/src/assets/textures")) {
+                if(normalizedKey.StartsWith('/')) {
+                    normalizedKey = "src/assets/textures" + normalizedKey;
+                } else {
+                    normalizedKey = "src/assets/textures/" + normalizedKey;
+                }
+            }
+            
+            if (!room.textureBitmaps.TryGetValue(normalizedKey, out var texture)) return;
 
-            double h = Math.Max(1, wallHeightScale / distance) * (wallHeight/room.textureBitmaps[stringTexture].texture.GetLength(1));
+            double h = Math.Max(1, wallHeightScale / distance) * (wallHeight/room.GetTexture(stringTexture).texture.GetLength(1));
             double baseHeight = wallHeightScale / distance;
             double top = viewHeight / 2.0 + pitch - h + 0.5 * baseHeight;
 
             int yStart = Math.Max(0, (int)Math.Floor(top));
             int yEnd = Math.Min(viewHeight - 1, (int)Math.Ceiling(top + h) - 1);
 
-            int texW = room.textureBitmaps[stringTexture].texture.GetLength(1);
-            int texH = room.textureBitmaps[stringTexture].texture.GetLength(0);
+            int texW = room.GetTexture(stringTexture).texture.GetLength(1);
+            int texH = room.GetTexture(stringTexture).texture.GetLength(0);
             int texX = Math.Clamp((int)(xPos * (texW - 1)), 0, texW - 1);
 
             // Ensure column stays within viewport bounds
@@ -195,7 +207,7 @@ namespace LibCast {
                 if (v < 0 || v >= 1) continue;
 
                 int texY = Math.Clamp((int)(v * (texH - 1)), 0, texH - 1);
-                Color c = room.textureBitmaps[stringTexture].texture[texY, texX];
+                Color c = room.GetTexture(stringTexture).texture[texY, texX];
                 if (c.A == 0) continue;
 
                 Screen.DrawPixelDepth(column + xPosition, y + yPosition, c, (int)(distance * 100)+viewDepth); 
@@ -264,7 +276,19 @@ namespace LibCast {
             // Ensure column and row stay within viewport bounds
             if (column < 0 || column >= viewWidth || y < 0 || y >= viewHeight) return;
 
-            if (textureKey == null || !room.textureBitmaps.TryGetValue(textureKey, out var texture)) return;
+            if (textureKey == null) return;
+            
+            // Normalize the texture key before looking it up
+            string normalizedKey = textureKey;
+            if(!normalizedKey.StartsWith("src/assets/textures/") && !normalizedKey.StartsWith("/src/assets/textures")) {
+                if(normalizedKey.StartsWith('/')) {
+                    normalizedKey = "src/assets/textures" + normalizedKey;
+                } else {
+                    normalizedKey = "src/assets/textures/" + normalizedKey;
+                }
+            }
+            
+            if (!room.textureBitmaps.TryGetValue(normalizedKey, out var texture)) return;
 
             double fracX = worldX - Math.Floor(worldX);
             double fracY = worldY - Math.Floor(worldY);
@@ -273,12 +297,12 @@ namespace LibCast {
                 fracX = 1.0-fracX;
             }
             
-            int texW = room.textureBitmaps[textureKey].texture.GetLength(1);
-            int texH = room.textureBitmaps[textureKey].texture.GetLength(0);
+            int texW = room.GetTexture(textureKey).texture.GetLength(1);
+            int texH = room.GetTexture(textureKey).texture.GetLength(0);
             int texX = Math.Clamp((int)(fracX * texW), 0, texW - 1);
             int texY = Math.Clamp((int)(fracY * texH), 0, texH - 1);
 
-            Color c = room.textureBitmaps[textureKey].texture[texY, texX];
+            Color c = room.GetTexture(textureKey).texture[texY, texX];
             if(c.A == 0) return;
             Screen.DrawPixelDepth(column + xPosition, y + yPosition, c, (int)(depthPerp * 100)+viewDepth);
         }
@@ -378,7 +402,7 @@ namespace LibCast {
         /* ---------------- Height from Aspect ---------------- */
 
         var tex =
-            room.textureBitmaps[texture].texture;
+            room.GetTexture(texture).texture;
 
         int texW = tex.GetLength(1);
         int texH = tex.GetLength(0);

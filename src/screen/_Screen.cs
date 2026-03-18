@@ -400,7 +400,7 @@ namespace LibCast {
         ) {
             if(viewW == -1) viewW = Screen.gameWidth;
             if(viewH == -1) viewH = Screen.gameHeight;
-            Color[,] tex = Game.room.textureBitmaps[texture].texture;
+            Color[,] tex = Game.room.GetTexture(texture).texture;
             int texH = tex.GetLength(0);
             int texW = tex.GetLength(1);
 

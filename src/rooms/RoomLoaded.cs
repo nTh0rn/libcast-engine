@@ -2,7 +2,7 @@ namespace LibCast {
     public class RoomLoaded : Room {
         public override string name {get; set;} = "rmLoaded";
         public override List<List<char>>? roomAsArray {get; set;} = new List<List<char>>();
-        public override string? skyboxTexture {get; set;} = "src/assets/textures/sky.png";
+        public override string? skyboxTexture {get; set;} = "sky.png";
 
         public RoomLoaded() : base(){
             LoadRoomFromJson("src/assets/rooms/testRoom.json");

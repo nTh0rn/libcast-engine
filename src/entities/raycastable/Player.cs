@@ -13,10 +13,10 @@ namespace LibCast {
         public double mouseSensitivity {get; set;} = 1;
         public double gravityAcceleration {get; set;} = -.2;
         public double gravityVelocity {get; set;} = 0;
-        public override EntityTexture? texture {get; set;} = new EntityTexture("src/assets/textures/shai_front.png",
-        "src/assets/textures/shai_left.png",
-        "src/assets/textures/shai_right.png",
-        "src/assets/textures/shai_back.png");
+        public override EntityTexture? texture {get; set;} = new EntityTexture("shai_front.png",
+        "shai_left.png",
+        "shai_right.png",
+        "shai_back.png");
 
 
         public PlayerEntity(int x, int y) {

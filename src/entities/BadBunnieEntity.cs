@@ -6,10 +6,10 @@ namespace LibCast {
         public override double direction { get; set; } = 0;
         public override double radius { get; set; } = 0.10;
         public string name = "def";
-        public override EntityTexture? texture {get; set;} = new EntityTexture("src/assets/textures/bb/bb_front.png",
-        "src/assets/textures/bb/bb_left.png",
-        "src/assets/textures/bb/bb_right.png",
-        "src/assets/textures/bb/bb_back.png");
+        public override EntityTexture? texture {get; set;} = new EntityTexture("bb/bb_front.png",
+        "bb/bb_left.png",
+        "bb/bb_right.png",
+        "bb/bb_back.png");
 
 
         public BadBunnieEntity(double x, double y, string name) {
