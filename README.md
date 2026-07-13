@@ -3,15 +3,15 @@
 
 <a id="readme-top"></a>
 <div align="center">
-<h1 align="center">LibCast C# Game Engine</h1>
+<h1 align="center">LibCast Engine</h1>
 
   <p align="center">
-    A from-scratch tile-based raycaster game-engine utilizing <a href="https://github.com/raylib-cs/raylib-cs">raylib</a>.
+    A from-scratch tile-based raycaster game-engine utilizing <a href="https://github.com/raylib-cs/raylib-cs">raylib-cs</a>.
   </p>
 
   <p align="center">
-<video src="https://nthorn.com/images/libcast/libcast-demo.mp4" width="500">
-<h6>Example LibCast project, featuring the engine's graphics techniques and UI functionality.</h6>
+<video src="https://nthorn.com/images/libcast/libcast-short-demo.webp" width="500">
+<h6>Example LibCast game</h6>
 </p>
 </div>
 
@@ -55,7 +55,7 @@ Developing games with LibCast currently is a UX-free affair, with tools like map
 
 ### Game Flow
 
-LibCast utilizes both entity and room-based game loops. The easiest way to understand the game flow is start in [_Program.cs]() and follow the loops into [_Game.cs](src\_Game.cs), and then the respective rooms.
+LibCast utilizes both entity and room-based game loops. The easiest way to understand the game flow is start in [_Program.cs](src\utility\_Program.cs) and follow the loops into [_Game.cs](src\_Game.cs), and then the respective rooms.
 
 The developer work-flow for LibCast is very similar to [GameMaker Studio](https://gamemaker.io/en) as it relates to map and entity (or "object") construction, step loops, and interrupts. All maps have entities and a main-loop, the main-loop then loops over all of it's entities' loops (see [_Room.cs](src\rooms\_Room.cs)).
 
@@ -68,9 +68,9 @@ See [_Screen.cs](src\screen\_Screen.cs) for all low-level drawing functions and 
 
 Walls/environments are rendered using [DDA raycasting techniques](https://lodev.org/cgtutor/raycasting.html), with support for variable-height, transparency, fixed-height floors/ceilings, and 2D scrolling sky-boxes. Entities are rendered as sprites.
 
-All custom graphics functions are ran CPU-side, making use of a screen buffer that gets rendered at a larger scale by RayLib. This allows for easy rendering of both low-resolution and high-resolution images (i.e. text over sprites) without the need for multiple variable-resolution buffers to render individual images to. This requires most games run at a low-resolution, something that is both an aesthetic decision for RayLib as well as a real technical limitation.
+All custom graphics functions are ran CPU-side, making use of a screen buffer that gets rendered at a larger scale by RayLib. This allows for easy rendering of both low-resolution and high-resolution images (i.e. text over sprites) without the need for multiple variable-resolution buffers to render individual images to. This requires that games made in LibCast run at a low-resolution, something that is both an aesthetic decision of LibCast as well as a real technical limitation.
 
-There is work-in-progress support for terminal-esque emulation for the purpose of developing ascii-based terminal-graphics based games that are not limited by actually having to run within a terminal (see [Terminal.cs]()).
+There is work-in-progress support for terminal-esque emulation for the purpose of developing ascii-based games that are not limited by actually having to run within a terminal (see [_Terminal.cs](src\screen\_Terminal.cs)).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -95,12 +95,11 @@ Menus are handled largely using state-machines (see [_UI.cs](src\screen\_Screen.
 
 RayLib's default project is a demo of a procedurally-generated open world. A default building or "structure" can be dynamically placed in this demo by pressing `b`.
 
-See [About](#about) for technical information to begin game development.
+See [About](#about) for technical information to begin game development. Proper and thorough documentation is coming in the future.
 
 ### Prerequisites
 
 Microsoft's [.NET](https://dotnet.microsoft.com/en-us/download) is required.
-
 
 ### Installation & Usage
 
