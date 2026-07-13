@@ -30,10 +30,10 @@
       <a href="#getting-started">Getting Started</a>
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation-usage">Installation & Usage</a></li>
+        <li><a href="#installation--usage">Installation & Usage</a></li>
       </ul>
     </li>
-    <li><a href="#ai-disclaimer">License</a></li>
+    <li><a href="#ai-disclaimer">AI Disclaimer</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
   </ol>
@@ -123,7 +123,7 @@ Notable exceptions exist in the following area(s):
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See `LICENSE.txt` for more information.
+Distributed under the MIT License and is subject to the licenses of both raylib and raylib-cs. See [LICENSE.txt](/LICENSE.txt) and [THIRD_PARTY_NOTICES.txt](/THIRD_PARTY_NOTICES.txt) for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
