@@ -10,7 +10,7 @@
   </p>
 
   <p align="center">
-<video src="https://nthorn.com/images/libcast/libcast-short-demo.webp" width="500">
+<img src="https://nthorn.com/images/libcast/libcast-short-demo.webp" width="500">
 <h6>Example LibCast game</h6>
 </p>
 </div>
