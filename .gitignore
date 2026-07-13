@@ -36,13 +36,24 @@ bld/
 [Ll]ogs/
 
 # Visual Studio Code
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-!.vscode/*.code-snippets
-!*.code-workspace
+.vscode/
+
+# JetBrains / IDE local settings
+.idea/
+.fleet/
+
+# macOS / Windows local artifacts
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor swap/backup files
+*.swp
+*.swo
+*~
+
+# For a public/open-source repo, keep editor-specific settings local
+.editorconfig
 
 # Built Visual Studio Code Extensions
 *.vsix
