@@ -1,8 +1,8 @@
-
 namespace LibCast {
     using Newtonsoft.Json;
     using System.Text.Json.Serialization;
     using System.Reflection;
+    using System.Collections.Generic;
 
     public class RoomData
     {
@@ -288,7 +288,46 @@ namespace LibCast {
             return textureBitmaps[textureString];
         }
 
+        private Color[,] ProcessTexture(Color[,] pixels) {
+            int offset=8;
+            for(int y = 0; y < pixels.GetLength(0); y += offset) {
+                for(int x = 0; x < pixels.GetLength(1); x += offset) {
+                    double sumR = 0, sumG = 0, sumB = 0, sumA=0;
+                    int count = 0;
 
+                    for(int y2 = 0; y2 < offset && y+y2 < pixels.GetLength(0); y2++) {
+                        for(int x2 = 0; x2 < offset && x+x2 < pixels.GetLength(1); x2++) {
+                            Color c = pixels[y+y2, x+x2];
+
+                            sumR += Math.Pow(c.R, 2);
+                            sumG += Math.Pow(c.G, 2);
+                            sumB += Math.Pow(c.B, 2);
+                            sumA += c.A;
+                            count++;
+                        }
+                    }
+
+                    if(count > 0) {
+
+                        Color average = new Color(
+                            (int)Math.Sqrt(sumR / count),
+                            (int)Math.Sqrt(sumG / count),
+                            (int)Math.Sqrt(sumB / count),
+                            (int)sumA / count
+                        );
+
+                        for(int y2 = 0; y2 < offset && y+y2 < pixels.GetLength(0); y2++) {
+                            for(int x2 = 0; x2 < offset && x+x2 < pixels.GetLength(1); x2++) {
+                                Color newColor = new Color(average.R, average.G, average.B, (average.A*2 + pixels[y+y2, x+x2].A)/3);
+                                pixels[y+y2, x+x2] = newColor;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            return pixels;
+        }
         
 
         private void LoadTextureFromPath(string texturePath) {
@@ -320,6 +359,8 @@ namespace LibCast {
                     pixels[y, x] = Raylib.GetImageColor(img, x, y);
                 }
             }
+
+            pixels = ProcessTexture(pixels);
             
             Raylib.UnloadImage(img);
 
